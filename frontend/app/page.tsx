@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 
 export default function Home() {
     const router = useRouter();
-    const { isLoaded, isSignedIn } = useUser();
+    const { isSignedIn } = useUser();
 
-    if (isLoaded && isSignedIn) {
+    if (isSignedIn) {
         router.push('/dashboard')
     }
     

@@ -1,7 +1,24 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import axios from 'axios';
+import { Transaction } from '@/app/types';
+import TransactionBody from '../../components/transaction-body';
 
-export default function RecentTransactions() {
+export default function RecentTransactions({user_id}: {user_id: string}) {
+    const [recentTransactions, setRecentTransactions] = useState([]);
 
+    const getRecentTransactions = async () => {
+        await axios.get(`http://localhost:8080/api/transactions/recent/${user_id}`)
+            .then(response => {
+                setRecentTransactions(response.data);
+            })
+            .catch(error => {
+                console.error("Error fetching recent transactions: ", error.message);
+            });
+    };
+
+    useEffect(() => {
+        getRecentTransactions();
+    }, []);
 
     return (
         <div>
@@ -16,15 +33,7 @@ export default function RecentTransactions() {
                         <th className='w-1/6 border border-zinc-300 px-6 py-4 text-left'>Category</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr className='hover:bg-white'>
-                        <td className='border border-zinc-300 px-6 py-4 text-left'>2021-09-01</td>
-                        <td className='border border-zinc-300 px-6 py-4 text-left'>Dinner</td>
-                        <td className='border border-zinc-300 px-6 py-4 text-right'>1000</td>
-                        <td className='border border-zinc-300 px-6 py-4 text-left'>Expense</td>
-                        <td className='border border-zinc-300 px-6 py-4 text-left'>Food & Drink</td>
-                    </tr>
-                </tbody>
+                <TransactionBody transactions={recentTransactions} />
             </table>
         </div>
     )

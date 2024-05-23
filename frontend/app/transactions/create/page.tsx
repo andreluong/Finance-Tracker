@@ -17,18 +17,18 @@ export default function CreateTransaction() {
         const description = formData.get('description');
         const type = formData.get('type');
         const date = formData.get('date');
-        const userId = user?.id;
+        const user_id = user?.id;
 
-        // await axios.post('http://localhost:8080/api/transactions/create', {
-        //     name,
-        //     amount,
-        //     description,
-        //     type,
-        //     date,
-        //     userId
-        // }).then(response => {
-        //     console.log(response.data);
-        // })
+        await axios.post('http://localhost:8080/api/transactions/create', {
+            name,
+            amount,
+            description,
+            type,
+            date,
+            user_id
+        }).then(response => {
+            console.log(response.data);
+        }).catch(error => console.error(error));
     }
 
     if (!isLoaded || !isSignedIn) {
@@ -62,6 +62,7 @@ export default function CreateTransaction() {
                         <div className='w-1/3 pr-4'>
                             <label htmlFor='type' className='block'>Type</label>
                             <select name='type' id='type' className='w-full border border-gray-200 bg-white rounded p-2'>
+                                <option disabled>Select</option>
                                 <option value='income'>Income</option>
                                 <option value='expense'>Expense</option>
                             </select>
@@ -70,6 +71,7 @@ export default function CreateTransaction() {
                         <div className='w-1/3 pr-4'>
                             <label htmlFor='category' className='block'>Category</label>
                             <select name='category' id='category' className='w-full border border-gray-200 bg-white rounded p-2'>
+                                <option disabled>Select</option>
                                 <option value='foodAndDrink'>Food & Drink</option>
                                 <option value='recreation'>Recreation</option>
                             </select>
@@ -87,7 +89,7 @@ export default function CreateTransaction() {
                 </form>          
             </div>
             
-            <RecentTransactions />
+            <RecentTransactions user_id={user.id} />
         </div>
     )
 }

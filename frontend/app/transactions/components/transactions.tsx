@@ -1,7 +1,25 @@
-import React from 'react'
+'use client'
 
-export default function Transactions() {
-    // TODO: add type prop for income/expenses separation
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
+import TransactionBody from './transaction-body';
+
+export default function Transactions({type, user_id}: {type: string, user_id: string}){
+    const [transactions, setTransactions] = useState([]);
+    
+    const getTransactions = async () => {
+        await axios.get(`http://localhost:8080/api/transactions/${type}/${user_id}`)
+            .then(response => {
+                setTransactions(response.data);
+            })
+            .catch(error => {
+                console.error("Error fetching transactions: ", error.message);
+            });
+    }
+
+    useEffect(() => {
+        getTransactions();
+    }, []);
     
     return (
         <table className='table-fixed w-full'>
@@ -14,29 +32,7 @@ export default function Transactions() {
                     <th className='w-1/6 border border-zinc-300 px-6 py-4 text-left'>Category</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr className='hover:bg-white'>
-                    <td className='border border-zinc-300 px-6 py-4 text-left'>2021-09-01</td>
-                    <td className='border border-zinc-300 px-6 py-4 text-left'>Dinner</td>
-                    <td className='border border-zinc-300 px-6 py-4 text-right'>1000</td>
-                    <td className='border border-zinc-300 px-6 py-4 text-left'>Expense</td>
-                    <td className='border border-zinc-300 px-6 py-4 text-left'>Restaurants</td>
-                </tr>
-                <tr className='hover:bg-white'>
-                    <td className='border border-zinc-300 px-6 py-4 text-left'>2021-09-02</td>
-                    <td className='border border-zinc-300 px-6 py-4 text-left'>Groceries</td>
-                    <td className='border border-zinc-300 px-6 py-4 text-right'>400</td>
-                    <td className='border border-zinc-300 px-6 py-4 text-left'>Expense</td>
-                    <td className='border border-zinc-300 px-6 py-4 text-left'>Groceries</td>
-                </tr>
-                <tr className='hover:bg-white'>
-                    <td className='border border-zinc-300 px-6 py-4 text-left'>2021-09-03</td>
-                    <td className='border border-zinc-300 px-6 py-4 text-left'>Shirt</td>
-                    <td className='border border-zinc-300 px-6 py-4 text-right'>600</td>
-                    <td className='border border-zinc-300 px-6 py-4 text-left'>Expense</td>
-                    <td className='border border-zinc-300 px-6 py-4 text-left'>Clothing</td>
-                </tr>
-            </tbody>
+            <TransactionBody transactions={transactions} />
         </table>
     )
 }

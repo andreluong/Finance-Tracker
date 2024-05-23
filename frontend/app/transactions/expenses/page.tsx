@@ -1,7 +1,16 @@
+'use client'
+
 import React from 'react'
 import Transactions from '../components/transactions'
+import { useUser } from '@clerk/nextjs';
 
 export default function Expenses() {
+    const { isLoaded, isSignedIn, user } = useUser();
+
+    if (!isLoaded || !isSignedIn) {
+        return <div>Loading...</div>;
+    }
+
     return (
         <div>
             <h1 className='font-bold text-3xl pb-4'>Expenses</h1>
@@ -70,7 +79,7 @@ export default function Expenses() {
                     </div>
                 </div>
             </div>
-            <Transactions />
+            <Transactions type={'expenses'} user_id={user.id} />
         </div>
     )
 }
