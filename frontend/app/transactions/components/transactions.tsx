@@ -1,26 +1,8 @@
-'use client'
-
-import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import TransactionBody from './transaction-body';
+import { Transaction } from '@/app/types';
 
-export default function Transactions({type, user_id}: {type: string, user_id: string}){
-    const [transactions, setTransactions] = useState([]);
-    
-    const getTransactions = async () => {
-        await axios.get(`http://localhost:8080/api/transactions/${type}/${user_id}`)
-            .then(response => {
-                setTransactions(response.data);
-            })
-            .catch(error => {
-                console.error("Error fetching transactions: ", error.message);
-            });
-    }
-
-    useEffect(() => {
-        getTransactions();
-    }, []);
-    
+export default function Transactions({transactions}: {transactions: Transaction[]}){
     return (
         <table className='table-fixed w-full'>
             <thead>

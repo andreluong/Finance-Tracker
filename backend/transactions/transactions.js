@@ -5,12 +5,18 @@ const database = require('../database/db');
 // Create a transaction for a user
 router.post('/api/transactions/create', async (req, res) => {
     try {
-        const {name, amount, description, type, date, user_id} = req.body;
+        const {name, amount, description, type, category, date, user_id} = req.body;
+
+        const categoryId = await database.category.getIdByValue(category);
+
+        console.log("Creating transaction", categoryId)
+
         await database.transaction.create({
             name,
             amount,
             description,
             type,
+            category: categoryId,
             date,
             user_id
         });
@@ -51,9 +57,9 @@ router.get('/api/transactions/recent/:user_id', async (req, res) => {
 });
 
 // Get all transactions for a user
-router.get('/api/transactions', async (req, res) => {
+router.get('/api/transactions/all/:user_id', async (req, res) => {
     try {
-        const user_id = req.query.user_id; // TODO:
+        const user_id = req.params.user_id; // TODO:
         const transactions = await database.transaction.getAll(user_id);
         res.status(200).json(transactions);
     } catch (error) {
@@ -106,6 +112,36 @@ router.put('/api/transactions/:id', async (req, res) => {
     }
 });
 
+
+
+// Get category stats for all transactions for a user
+router.get('/api/transactions/category/stats/:user_id', async (req, res) => {
+    try {
+        const user_id = req.params.user_id;
+
+        // Get number of transactions
+        const transactions = await database.transaction.getAll(user_id);
+        const numTransactions = transactions.length;
+
+        // Get number of transactions for each category
+        const categoryStats = await database.category.getCountPerCategory(user_id);
+
+        // Calculate percentage of transactions for each category
+        const stats = categoryStats.map(category => {
+            let percentage = (category.count / numTransactions) * 100;
+            percentage = percentage.toFixed(2);
+            return {
+                ...category,
+                percentage
+            }
+        });
+        console.log("Category stats retrieved")
+        res.status(200).json(stats);
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({error: "Something went wrong with transaction category stats retrieval"});
+    }
+})
 
 
 module.exports = router;

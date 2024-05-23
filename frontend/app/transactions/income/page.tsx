@@ -1,15 +1,31 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Transactions from '../components/transactions'
 import { useUser } from '@clerk/nextjs';
+import axios from 'axios';
 
 export default function Income() {
+    const [transactions, setTransactions] = useState([]);
     const { isLoaded, isSignedIn, user } = useUser();
 
     if (!isLoaded || !isSignedIn) {
         return <div>Loading...</div>;
     }
+
+    const getTransactions = async () => {
+        await axios.get(`http://localhost:8080/api/transactions/income/${user.id}`)
+            .then(response => {
+                setTransactions(response.data);
+            })
+            .catch(error => {
+                console.error("Error fetching transactions: ", error.message);
+            });
+    }
+
+    useEffect(() => {
+        getTransactions();
+    }, []);
 
     return (
         <div>
@@ -79,7 +95,7 @@ export default function Income() {
                     </div>
                 </div>
             </div>
-            <Transactions type={'income'} user_id={user.id} />
+            <Transactions transactions={transactions} />
         </div>
     )
 }

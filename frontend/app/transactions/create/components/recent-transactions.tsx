@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios';
-import { Transaction } from '@/app/types';
 import TransactionBody from '../../components/transaction-body';
 
 export default function RecentTransactions({user_id}: {user_id: string}) {

@@ -11,19 +11,14 @@ const pool = new Pool({
 
 // Queries
 
-const getAllUsers = async () => {
-    const res = await pool.query('SELECT * FROM public.user');
-    return res.rows;
-};
-
 const transaction = {
     create: async function(transaction) {
-        const {name, amount, description, type, date, user_id} = transaction;
+        const {name, amount, description, type, category, date, user_id} = transaction;
         const q = `
             INSERT INTO transaction (amount, name, description, type, category_id, date, user_id)
-            VALUES ($1, $2, $3, $4, NULL, $5, $6)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
         `
-        await pool.query(q, [amount, name, description, type, new Date(date), user_id]);
+        await pool.query(q, [amount, name, description, type, category, new Date(date), user_id]);
     },
     
     getById: async function(id, user_id) {
@@ -76,5 +71,39 @@ const expenses = {
     }
 }
 
+const category = {
+    getAll: async function() {
+        const res = await pool.query('SELECT * FROM category');
+        return res.rows;
+    },
+    
+    getIdByValue: async function(value) {
+        const q = `SELECT id FROM public.category WHERE value = $1`
+        const res = await pool.query(q, [value]);
+        return res.rows[0].id;
+    },
 
-module.exports = { getAllUsers, transaction, income, expenses };
+    getCountPerCategory: async function(user_id) {
+        const q = `
+            SELECT 
+                c.name AS name,
+                COUNT(t.id) AS count,
+                SUM(t.amount) AS total
+            FROM 
+                transaction t
+            JOIN 
+                category c ON t.category_id = c.id
+            WHERE
+                t.user_id = $1
+            GROUP BY 
+                c.name
+            ORDER BY 
+                count DESC;
+        `
+        const res = await pool.query(q, [user_id]);
+        return res.rows;
+    }
+}
+
+
+module.exports = { transaction, income, expenses, category };

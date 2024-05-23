@@ -13,21 +13,11 @@ app.use(express.json());
 
 
 
-const database = require('./database/db.js');
-
-app.get('/api/users', async (req, res) => {
-    try {
-        res.status(200).json(database.getAllUsers(req, res));
-    } catch (err) {
-        console.error(err.message);
-    }
-});
-
-
 const transactions = require('./transactions/transactions.js');
 app.use(transactions);
 
-
+const categories = require('./categories/categories.js');
+app.use(categories);
 
 app.listen(8080, () => {
     console.log('Server is running on port 8080');

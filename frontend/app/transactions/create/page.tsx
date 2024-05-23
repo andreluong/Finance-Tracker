@@ -1,12 +1,18 @@
 'use client';
 
-import { FormEvent } from 'react'
+import { FormEvent, useState } from 'react'
 import axios from 'axios';
 import { useUser } from '@clerk/nextjs';
 import RecentTransactions from './components/recent-transactions';
+import CategorySelection from './components/category-selection';
 
 export default function CreateTransaction() {
+    const [selectedCategory, setSelectedCategory] = useState('' as string);
     const { isLoaded, isSignedIn, user } = useUser();
+
+    function handleCategoryChange(category: string) {
+        setSelectedCategory(category);
+    }
 
     async function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -16,6 +22,7 @@ export default function CreateTransaction() {
         const amount = formData.get('amount');
         const description = formData.get('description');
         const type = formData.get('type');
+        const category = selectedCategory;
         const date = formData.get('date');
         const user_id = user?.id;
 
@@ -24,6 +31,7 @@ export default function CreateTransaction() {
             amount,
             description,
             type,
+            category,
             date,
             user_id
         }).then(response => {
@@ -62,19 +70,14 @@ export default function CreateTransaction() {
                         <div className='w-1/3 pr-4'>
                             <label htmlFor='type' className='block'>Type</label>
                             <select name='type' id='type' className='w-full border border-gray-200 bg-white rounded p-2'>
-                                <option disabled>Select</option>
-                                <option value='income'>Income</option>
-                                <option value='expense'>Expense</option>
+                                <option value='income' className='font-sans'>Income</option>
+                                <option value='expense' className='font-sans'>Expense</option>
                             </select>
                         </div>
 
                         <div className='w-1/3 pr-4'>
                             <label htmlFor='category' className='block'>Category</label>
-                            <select name='category' id='category' className='w-full border border-gray-200 bg-white rounded p-2'>
-                                <option disabled>Select</option>
-                                <option value='foodAndDrink'>Food & Drink</option>
-                                <option value='recreation'>Recreation</option>
-                            </select>
+                            <CategorySelection onCategoryChange={handleCategoryChange} />
                         </div>                       
                     </div>
 

@@ -18,7 +18,14 @@ export type Transaction = {
     name: string;
     description: string;
     type: string;
-    category: number;
+    category_id: number;
     date: string;
     user_id: string;
 };
+
+export type Category = {
+    id: number;
+    name: string;
+    value: string;
+    icon?: JSX.Element;
+}
