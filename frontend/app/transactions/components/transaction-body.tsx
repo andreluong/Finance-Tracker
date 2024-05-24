@@ -5,11 +5,11 @@ export default function TransactionBody({transactions}: {transactions: Transacti
     const rows = transactions.map((transaction: Transaction) => {
         return (
             <tr key={transaction.id} className='hover:bg-white'>
-                <td className='border border-zinc-300 px-6 py-4 text-left'>{transaction.date}</td>
+                <td className='border border-zinc-300 px-6 py-4 text-left'>{new Date(transaction.date).toLocaleDateString('en-US')}</td>
                 <td className='border border-zinc-300 px-6 py-4 text-left'>{transaction.name}</td>
-                <td className='border border-zinc-300 px-6 py-4 text-right'>{transaction.amount}</td>
+                <td className='border border-zinc-300 px-6 py-4 text-right'>$ {transaction.amount}</td>
                 <td className='border border-zinc-300 px-6 py-4 text-left'>{transaction.type}</td>
-                <td className='border border-zinc-300 px-6 py-4 text-left'>{transaction.category_id}</td>
+                <td className='border border-zinc-300 px-6 py-4 text-left'>{transaction.category}</td>
             </tr>
         )
     });

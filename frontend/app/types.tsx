@@ -18,7 +18,8 @@ export type Transaction = {
     name: string;
     description: string;
     type: string;
-    category_id: number;
+    category: string;
+    category_value: string;
     date: string;
     user_id: string;
 };
@@ -28,4 +29,11 @@ export type Category = {
     name: string;
     value: string;
     icon?: JSX.Element;
+}
+
+export type CategoryStat = {
+    name: string;
+    count: string;
+    total: string;
+    percentage: string;
 }

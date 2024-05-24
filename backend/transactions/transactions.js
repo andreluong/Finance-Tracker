@@ -72,7 +72,7 @@ router.get('/api/transactions/all/:user_id', async (req, res) => {
 router.get('/api/transactions/income/:user_id', async (req, res) => {
     try {
         const user_id = req.params.user_id; // TODO:
-        const transactions = await database.income.getAll(user_id);
+        const transactions = await database.transaction.getAllByType('income', user_id);
         res.status(200).json(transactions);
     } catch (error) {
         console.error(error.message);
@@ -84,7 +84,7 @@ router.get('/api/transactions/income/:user_id', async (req, res) => {
 router.get('/api/transactions/expenses/:user_id', async (req, res) => {
     try {
         const user_id = req.params.user_id; // TODO:
-        const transactions = await database.expenses.getAll(user_id);
+        const transactions = await database.transaction.getAllByType('expense', user_id);
         res.status(200).json(transactions);
     } catch (error) {
         console.error(error.message);
@@ -112,36 +112,63 @@ router.put('/api/transactions/:id', async (req, res) => {
     }
 });
 
-
-
 // Get category stats for all transactions for a user
 router.get('/api/transactions/category/stats/:user_id', async (req, res) => {
     try {
         const user_id = req.params.user_id;
 
-        // Get number of transactions
-        const transactions = await database.transaction.getAll(user_id);
-        const numTransactions = transactions.length;
+        const sumTotal = await database.transaction.getSumOfAmounts(user_id);
+        const categoryStats = await database.category.getTotalAmountPerCategory(user_id);
 
-        // Get number of transactions for each category
-        const categoryStats = await database.category.getCountPerCategory(user_id);
-
-        // Calculate percentage of transactions for each category
+        // Calculate percentage of transaction amounts for each category
         const stats = categoryStats.map(category => {
-            let percentage = (category.count / numTransactions) * 100;
+            let percentage = (category.total / sumTotal) * 100;
             percentage = percentage.toFixed(2);
             return {
                 ...category,
                 percentage
             }
         });
+
         console.log("Category stats retrieved")
-        res.status(200).json(stats);
+        res.status(200).json({stats, sumTotal});
     } catch (error) {
         console.error(error.message);
         res.status(500).json({error: "Something went wrong with transaction category stats retrieval"});
     }
 })
+
+// Get category stats for transactions of a specific type for a user
+router.get('/api/transactions/category/stats/:type/:user_id', async (req, res) => {
+    try {
+        let type = req.params.type;
+        const user_id = req.params.user_id;
+
+        if (type == 'expenses') {
+            type = 'expense';
+        }
+
+        const sumTotal = await database.transaction.getSumOfAmounts(type, user_id);
+        const categoryStats = await database.category.getTotalAmountPerCategory(type, user_id);
+
+        // Calculate percentage of transaction amounts for each category
+        const stats = categoryStats.map(category => {
+            let percentage = (category.total / sumTotal) * 100;
+            percentage = percentage.toFixed(2);
+            return {
+                ...category,
+                percentage
+            }
+        });
+
+        console.log("Category stats retrieved")
+        res.status(200).json({stats, sumTotal});
+
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({error: "Something went wrong with transaction category stats retrieval"});
+    }
+});
 
 
 module.exports = router;

@@ -33,8 +33,65 @@ const transaction = {
         return res.rows;
     },
 
+    getAllByType: async function(type, user_id) {
+        const q = `
+            SELECT 
+                transaction.id,
+                created_at,
+                amount,
+                transaction.name,
+                category.name AS category,
+                category.value AS category_value,
+                description,
+                type,
+                date,
+                user_id
+            FROM 
+                transaction, category
+            WHERE
+                category_id = category.id
+                AND type = $1
+                AND user_id = $2
+        `
+        const res = await pool.query(q, [type, user_id]);
+        return res.rows;
+    },
+
+    getSumOfAmounts: async function(user_id) {
+        const q = `SELECT SUM(amount) FROM transaction WHERE user_id = $1`
+        const res = await pool.query(q, [user_id]);
+        return res.rows[0];
+    },
+
+    getSumOfAmounts: async function(type, user_id) {
+        const q = `SELECT SUM(amount) FROM transaction WHERE type = $1 AND user_id = $2`
+        const res = await pool.query(q, [type, user_id]);
+        return res.rows[0].sum;
+    },
+
     getRecent: async function(user_id) {
-        const q = `SELECT * FROM transaction WHERE user_id = $1 ORDER BY date LIMIT 10`
+        const q = `
+            SELECT 
+                transaction.id,
+                created_at,
+                amount,
+                transaction.name,
+                category.name AS category,
+                category.value AS category_value,
+                description,
+                type,
+                date,
+                user_id
+            FROM 
+                transaction, category
+            WHERE 
+                category_id = category.id
+                AND user_id = $1 
+            ORDER BY 
+                date 
+            LIMIT 
+                10
+        `
         const res = await pool.query(q, [user_id]);
         return res.rows;
     },
@@ -55,22 +112,6 @@ const transaction = {
     }
 }
 
-const income = {
-    getAll: async function(user_id) {
-        const q = `SELECT * FROM transaction WHERE user_id = $1 AND type = 'income'`
-        const res = await pool.query(q, [user_id]);
-        return res.rows;
-    }
-}
-
-const expenses = {
-    getAll: async function(user_id) {
-        const q = `SELECT * FROM transaction WHERE user_id = $1 AND type = 'expense'`
-        const res = await pool.query(q, [user_id]);
-        return res.rows;
-    }
-}
-
 const category = {
     getAll: async function() {
         const res = await pool.query('SELECT * FROM category');
@@ -78,9 +119,15 @@ const category = {
     },
     
     getIdByValue: async function(value) {
-        const q = `SELECT id FROM public.category WHERE value = $1`
+        const q = `SELECT id FROM category WHERE value = $1`
         const res = await pool.query(q, [value]);
         return res.rows[0].id;
+    },
+
+    getNameById: async function(id) {
+        const q = `SELECT name FROM category WHERE id = $1`
+        const res = await pool.query(q, [id]);
+        return res.rows[0].name;
     },
 
     getCountPerCategory: async function(user_id) {
@@ -102,8 +149,30 @@ const category = {
         `
         const res = await pool.query(q, [user_id]);
         return res.rows;
+    },
+
+    getTotalAmountPerCategory: async function(type, user_id) {
+        const q = `
+            SELECT 
+                c.name AS name,
+                COUNT(t.id) AS count,
+                SUM(t.amount) AS total
+            FROM 
+                transaction t
+            JOIN 
+                category c ON t.category_id = c.id
+            WHERE
+                t.type = $1
+                AND t.user_id = $2
+            GROUP BY 
+                c.name
+            ORDER BY 
+                total DESC;
+        `
+        const res = await pool.query(q, [type, user_id]);
+        return res.rows;
     }
 }
 
 
-module.exports = { transaction, income, expenses, category };
+module.exports = { transaction, category };

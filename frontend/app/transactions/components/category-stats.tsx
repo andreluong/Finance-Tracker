@@ -1,14 +1,21 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
+import DonutChart from './donut-chart';
+import { CategoryStat } from '@/app/types';
 
-export default function CategoryStats({user_id}: {user_id: string}) {
-    const [categoryStats, setCategoryStats] = useState<any[]>([]);
+export default function CategoryStats({type, user_id}: {type: string | null, user_id: string}) {
+    const [categoryStats, setCategoryStats] = useState<CategoryStat[]>([]);
+    const [total, setTotal] = useState<number>(0);
 
     const getCategoryStats = async () => {
-        await axios.get(`http://localhost:8080/api/transactions/category/stats/${user_id}`)
+        const url = type 
+            ? `http://localhost:8080/api/transactions/category/stats/${type}/${user_id}`
+            : `http://localhost:8080/api/transactions/category/stats/${user_id}`; 
+
+        await axios.get(url)
             .then(response => {
-                console.log(response.data);
-                setCategoryStats(response.data);
+                setCategoryStats(response.data.stats);
+                setTotal(response.data.sumTotal);
             })
             .catch(error => {
                 console.error("Error fetching category stats: ", error.message);
@@ -18,13 +25,19 @@ export default function CategoryStats({user_id}: {user_id: string}) {
     useEffect(() => {
         getCategoryStats();
     }, [])
-    
+
+    console.log(categoryStats)
+
     return (
         <div className='flex flex-wrap mb-4'>
             <div className='flex items-center justify-center w-1/2'>
-                <img src='/assets/images/graph.png' alt='Graph'/>
+                <DonutChart 
+                    series={categoryStats.map(category => Number(category.total))} 
+                    labels={categoryStats.map(category => category.name)} 
+                    total={total}
+                />
             </div>
-
+            
             <div className='w-1/2'>
                 <div className='flex justify-end'>
                     <table className='table-fixed w-full ml-16'>

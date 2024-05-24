@@ -10,12 +10,8 @@ export default function Expenses() {
     const [transactions, setTransactions] = useState([]);
     const { isLoaded, isSignedIn, user } = useUser();
 
-    if (!isLoaded || !isSignedIn) {
-        return <div>Loading...</div>;
-    }
-
     const getTransactions = async () => {
-        await axios.get(`http://localhost:8080/api/transactions/expenses/${user.id}`)
+        await axios.get(`http://localhost:8080/api/transactions/expenses/${user?.id}`)
             .then(response => {
                 setTransactions(response.data);
             })
@@ -27,6 +23,10 @@ export default function Expenses() {
     useEffect(() => {
         getTransactions();
     }, []);
+
+    if (!isLoaded || !isSignedIn) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div>
@@ -59,8 +59,7 @@ export default function Expenses() {
                     </li>
                 </ul>
             </div>
-
-            <CategoryStats user_id={user.id} />
+            <CategoryStats type="expenses" user_id={user.id} />
             <Transactions transactions={transactions} />
         </div>
     )
