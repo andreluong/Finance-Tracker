@@ -28,7 +28,24 @@ const transaction = {
     },
 
     getAll: async function(user_id) {
-        const q = `SELECT * FROM transaction WHERE user_id = $1`
+        const q = `
+            SELECT 
+                transaction.id,
+                created_at,
+                amount,
+                transaction.name,
+                category.name AS category,
+                category.value AS category_value,
+                description,
+                transaction.type,
+                date,
+                user_id
+            FROM 
+                transaction, category
+            WHERE
+                category_id = category.id
+                AND user_id = $1
+        `
         const res = await pool.query(q, [user_id]);
         return res.rows;
     },
@@ -43,7 +60,7 @@ const transaction = {
                 category.name AS category,
                 category.value AS category_value,
                 description,
-                type,
+                transaction.type,
                 date,
                 user_id
             FROM 
@@ -60,10 +77,10 @@ const transaction = {
     getSumOfAmounts: async function(user_id) {
         const q = `SELECT SUM(amount) FROM transaction WHERE user_id = $1`
         const res = await pool.query(q, [user_id]);
-        return res.rows[0];
+        return res.rows[0].sum;
     },
 
-    getSumOfAmounts: async function(type, user_id) {
+    getSumOfAmountsOfType: async function(type, user_id) {
         const q = `SELECT SUM(amount) FROM transaction WHERE type = $1 AND user_id = $2`
         const res = await pool.query(q, [type, user_id]);
         return res.rows[0].sum;
@@ -79,7 +96,7 @@ const transaction = {
                 category.name AS category,
                 category.value AS category_value,
                 description,
-                type,
+                transaction.type,
                 date,
                 user_id
             FROM 
@@ -88,7 +105,7 @@ const transaction = {
                 category_id = category.id
                 AND user_id = $1 
             ORDER BY 
-                date 
+                created_at desc
             LIMIT 
                 10
         `
@@ -114,10 +131,11 @@ const transaction = {
 
 const category = {
     getAll: async function() {
-        const res = await pool.query('SELECT * FROM category');
+        const q = `SELECT * FROM category`;
+        const res = await pool.query(q);
         return res.rows;
     },
-    
+
     getIdByValue: async function(value) {
         const q = `SELECT id FROM category WHERE value = $1`
         const res = await pool.query(q, [value]);
@@ -130,10 +148,11 @@ const category = {
         return res.rows[0].name;
     },
 
-    getCountPerCategory: async function(user_id) {
+    getTotalAmountPerCategory: async function(user_id) {
         const q = `
             SELECT 
                 c.name AS name,
+                c.colour AS colour,
                 COUNT(t.id) AS count,
                 SUM(t.amount) AS total
             FROM 
@@ -143,18 +162,20 @@ const category = {
             WHERE
                 t.user_id = $1
             GROUP BY 
-                c.name
+                c.name,
+                c.colour
             ORDER BY 
-                count DESC;
+                total DESC;
         `
         const res = await pool.query(q, [user_id]);
         return res.rows;
     },
 
-    getTotalAmountPerCategory: async function(type, user_id) {
+    getTotalAmountPerCategoryOfType: async function(type, user_id) {
         const q = `
             SELECT 
                 c.name AS name,
+                c.colour AS colour,
                 COUNT(t.id) AS count,
                 SUM(t.amount) AS total
             FROM 
@@ -165,7 +186,8 @@ const category = {
                 t.type = $1
                 AND t.user_id = $2
             GROUP BY 
-                c.name
+                c.name,
+                c.colour
             ORDER BY 
                 total DESC;
         `

@@ -1,5 +1,4 @@
 import React from 'react'
-import TransactionBody from './transaction-body';
 import { Transaction } from '@/app/types';
 
 export default function Transactions({transactions}: {transactions: Transaction[]}){
@@ -14,7 +13,17 @@ export default function Transactions({transactions}: {transactions: Transaction[
                     <th className='w-1/6 border border-zinc-300 px-6 py-4 text-left'>Category</th>
                 </tr>
             </thead>
-            <TransactionBody transactions={transactions} />
+            <tbody>
+                {transactions.map((transaction: Transaction) => (
+                    <tr key={transaction.id} className='hover:bg-white'>
+                        <td className='border border-zinc-300 px-6 py-4 text-left'>{new Date(transaction.date).toLocaleDateString('en-US')}</td>
+                        <td className='border border-zinc-300 px-6 py-4 text-left'>{transaction.name}</td>
+                        <td className='border border-zinc-300 px-6 py-4 text-right'>$ {transaction.amount}</td>
+                        <td className='border border-zinc-300 px-6 py-4 text-left'>{transaction.type}</td>
+                        <td className='border border-zinc-300 px-6 py-4 text-left'>{transaction.category}</td>
+                    </tr>
+                ))}
+            </tbody>
         </table>
     )
 }
