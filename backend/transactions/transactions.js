@@ -48,7 +48,6 @@ router.get('/api/transactions/recent/:user_id', async (req, res) => {
     try {
         const user_id = req.params.user_id;
         const transactions = await database.transaction.getRecent(user_id);
-        console.log("Transactions retrieved")
         res.status(200).json(transactions);
     } catch (error) {
         console.error(error.message);
@@ -116,6 +115,7 @@ router.put('/api/transactions/:id', async (req, res) => {
 router.get('/api/transactions/category/stats/:user_id', async (req, res) => {
     try {
         const user_id = req.params.user_id;
+        console.log("Getting category stats for all transactions");
 
         const sumTotal = await database.transaction.getSumOfAmounts(user_id);
         const categoryStats = await database.category.getTotalAmountPerCategory(user_id);
@@ -130,7 +130,7 @@ router.get('/api/transactions/category/stats/:user_id', async (req, res) => {
             }
         });
 
-        console.log("Category stats retrieved")
+        console.log("Category stats retrieved for all transactions");
         res.status(200).json({stats, sumTotal});
     } catch (error) {
         console.error(error.message);
@@ -144,12 +144,14 @@ router.get('/api/transactions/category/stats/:type/:user_id', async (req, res) =
         let type = req.params.type;
         const user_id = req.params.user_id;
 
+        console.log("Getting category stats for all transactions of type:", type);
+
         if (type == 'expenses') {
             type = 'expense';
         }
 
-        const sumTotal = await database.transaction.getSumOfAmounts(type, user_id);
-        const categoryStats = await database.category.getTotalAmountPerCategory(type, user_id);
+        const sumTotal = await database.transaction.getSumOfAmountsOfType(type, user_id);
+        const categoryStats = await database.category.getTotalAmountPerCategoryOfType(type, user_id);
 
         // Calculate percentage of transaction amounts for each category
         const stats = categoryStats.map(category => {
@@ -161,7 +163,7 @@ router.get('/api/transactions/category/stats/:type/:user_id', async (req, res) =
             }
         });
 
-        console.log("Category stats retrieved")
+        console.log("Category stats retrieved for all transactions of type:", type);
         res.status(200).json({stats, sumTotal});
 
     } catch (error) {

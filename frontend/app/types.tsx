@@ -29,6 +29,8 @@ export type Category = {
     name: string;
     value: string;
     icon?: JSX.Element;
+    colour: string;
+    type: string;
 }
 
 export type CategoryStat = {
@@ -36,4 +38,5 @@ export type CategoryStat = {
     count: string;
     total: string;
     percentage: string;
+    colour: string;
 }
