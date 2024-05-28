@@ -67,10 +67,59 @@ const transaction = {
                 transaction, category
             WHERE
                 category_id = category.id
-                AND type = $1
+                AND transaction.type = $1
                 AND user_id = $2
         `
         const res = await pool.query(q, [type, user_id]);
+        return res.rows;
+    },
+
+    getAllByCategory: async function(category, user_id) {
+        const q = `
+            SELECT 
+                transaction.id,
+                created_at,
+                amount,
+                transaction.name,
+                category.name AS category,
+                category.value AS category_value,
+                description,
+                transaction.type,
+                date,
+                user_id
+            FROM 
+                transaction, category
+            WHERE
+                category_id = category.id
+                AND category.value = $1
+                AND user_id = $2
+        `
+        const res = await pool.query(q, [category, user_id]);
+        return res.rows;
+    },
+
+    getAllByTypeAndCategory: async function(type, category, user_id) {
+        const q = `
+            SELECT 
+                transaction.id,
+                created_at,
+                amount,
+                transaction.name,
+                category.name AS category,
+                category.value AS category_value,
+                description,
+                transaction.type,
+                date,
+                user_id
+            FROM 
+                transaction, category
+            WHERE
+                category_id = category.id
+                AND transaction.type = $1
+                AND category.value = $2
+                AND user_id = $3
+        `
+        const res = await pool.query(q, [type, category, user_id]);
         return res.rows;
     },
 
@@ -136,6 +185,12 @@ const category = {
         return res.rows;
     },
 
+    getByType: async function(type) {
+        const q = `SELECT * FROM category WHERE type = $1`
+        const res = await pool.query(q, [type]);
+        return res.rows;
+    },
+
     getIdByValue: async function(value) {
         const q = `SELECT id FROM category WHERE value = $1`
         const res = await pool.query(q, [value]);
@@ -153,6 +208,7 @@ const category = {
             SELECT 
                 c.name AS name,
                 c.colour AS colour,
+                c.type AS type,
                 COUNT(t.id) AS count,
                 SUM(t.amount) AS total
             FROM 
@@ -163,7 +219,8 @@ const category = {
                 t.user_id = $1
             GROUP BY 
                 c.name,
-                c.colour
+                c.colour,
+                c.type
             ORDER BY 
                 total DESC;
         `

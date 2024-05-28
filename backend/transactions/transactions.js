@@ -59,7 +59,21 @@ router.get('/api/transactions/recent/:user_id', async (req, res) => {
 router.get('/api/transactions/all/:user_id', async (req, res) => {
     try {
         const user_id = req.params.user_id; // TODO:
-        const transactions = await database.transaction.getAll(user_id);
+        const type = req.query.type;
+        const category = req.query.category;
+
+        let transactions = [];
+
+        if (type && category && type !== 'all' && category !== 'all') {
+            transactions = await database.transaction.getAllByTypeAndCategory(type, category, user_id);
+            res
+        } else if (type && type !== 'all') {
+            transactions = await database.transaction.getAllByType(type, user_id);
+        } else if (category && category !== 'all') {
+            transactions = await database.transaction.getAllByCategory(category, user_id);
+        } else {
+            transactions = await database.transaction.getAll(user_id);
+        }
         res.status(200).json(transactions);
     } catch (error) {
         console.error(error.message);
@@ -131,7 +145,7 @@ router.get('/api/transactions/category/stats/:user_id', async (req, res) => {
         });
 
         console.log("Category stats retrieved for all transactions");
-        res.status(200).json({stats, sumTotal});
+        res.status(200).json({categoryStats: stats, total: sumTotal});
     } catch (error) {
         console.error(error.message);
         res.status(500).json({error: "Something went wrong with transaction category stats retrieval"});
@@ -164,7 +178,7 @@ router.get('/api/transactions/category/stats/:type/:user_id', async (req, res) =
         });
 
         console.log("Category stats retrieved for all transactions of type:", type);
-        res.status(200).json({stats, sumTotal});
+        res.status(200).json({categoryStats: stats, total: sumTotal});
 
     } catch (error) {
         console.error(error.message);

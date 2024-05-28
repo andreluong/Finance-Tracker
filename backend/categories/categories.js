@@ -5,7 +5,16 @@ const database = require('../database/db');
 // Get all categories
 router.get('/api/categories', async (req, res) => {
     try {
-        const categories = await database.category.getAll();
+        const type = req.query.type;
+        let categories = [];
+
+        if (type === 'all' || type === undefined) {
+            categories = await database.category.getAll();
+        } else if (type === 'income' || type === 'expense')
+        {
+            categories = await database.category.getByType(type);
+        }
+
         res.status(200).json(categories);
     } catch (error) {
         console.error(error.message);
