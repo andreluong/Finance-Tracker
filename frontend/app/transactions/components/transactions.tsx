@@ -11,7 +11,7 @@ export default function Transactions({
     const [rowsToShow, setRowsToShow] = useState<Transaction[]>(
         transactions.slice(0, rowsLimit)
     );
-    const [totalPage] = useState<number>(
+    const [totalPage, setTotalPage] = useState<number>(
         Math.ceil(
             (transactions.length === 0 ? 1 : transactions.length) / rowsLimit
         )
@@ -55,6 +55,10 @@ export default function Transactions({
 
     useEffect(() => {
         setRowsToShow(transactions.slice(0, rowsLimit));
+        setTotalPage(Math.ceil(
+            (transactions.length === 0 ? 1 : transactions.length) / rowsLimit
+        ))
+        setCurrentPage(0);
     }, [transactions]);
 
     return (

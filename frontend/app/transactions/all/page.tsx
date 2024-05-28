@@ -7,6 +7,7 @@ import Transactions from "../components/transactions";
 import { Category } from "@/app/types";
 import useSWR from "swr";
 import { fetcher } from "@/app/lib/utils";
+import { IsLoadingResponse } from "swr/_internal";
 
 export default function AllTransactions() {
     const { isLoaded, isSignedIn, user } = useUser();
@@ -19,26 +20,18 @@ export default function AllTransactions() {
         isLoading: fetchTransactionsLoading
     } = useSWR(
         `http://localhost:8080/api/transactions/all/${user?.id}?type=${type}&category=${category}`, // TODO: On load, user is not defined, so this runs once as an error
-        fetcher
+        fetcher,
+        { refreshInterval: 1000}
     );
 
     const {
         data: categories,
         error: fetchCategoriesError,
         isLoading: fetchCategoriesLoading
-    } = useSWR(
-        `http://localhost:8080/api/categories`,
+    } = useSWR<Category[], Error, any>(
+        `http://localhost:8080/api/categories?type=${type}`,
         fetcher
     );
-
-    const filterCategoriesByType = () => {
-        if (type === "income" || type === "expense") {
-            return categories.filter(
-                (category: Category) => category.type === type
-            );
-        }
-        return categories;
-    };
 
     // User
     if (!isLoaded || !isSignedIn) {
@@ -80,19 +73,21 @@ export default function AllTransactions() {
                     <li className="pr-8">
                         <div className="flex flex-nowrap">
                             <p>Category:&nbsp;</p>
-                            {fetchCategoriesError && <div>Error loading categories</div>}
-                            {fetchCategoriesLoading && <div>Loading...</div>}
-                            {categories && (
-                                <select
-                                    value={category}
-                                    onChange={(e) => setCategory(e.target.value)}
-                                >
-                                    <option value="all">All</option>
-                                    {filterCategoriesByType().map((category: Category) => (
-                                        <option key={category.id} value={category.value}>{category.name}</option>
-                                    ))}
-                                </select>
-                            )}
+                            <select
+                                value={category}
+                                onChange={(e) => setCategory(e.target.value)}
+                            >
+                                {fetchCategoriesLoading && <option disabled>Loading...</option>}
+                                {fetchCategoriesError && <option disabled>Error loading categories</option>}
+                                {categories && (
+                                    <>
+                                        <option value="all">All</option>
+                                        {categories.map((category: Category) => (
+                                            <option key={category.id} value={category.value}>{category.name}</option>
+                                        ))}
+                                    </>
+                                )}
+                            </select>
                         </div>
                     </li>
                 </ul>
