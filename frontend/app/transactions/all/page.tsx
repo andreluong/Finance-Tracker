@@ -28,7 +28,7 @@ export default function AllTransactions() {
         error: fetchCategoriesError,
         isLoading: fetchCategoriesLoading,
     } = useSWR<Category[], Error, any>(
-        `http://localhost:8080/api/categories?type=${type}`,
+        `http://localhost:8080/api/categories/unique?type=${type}`,
         fetcher
     );
 

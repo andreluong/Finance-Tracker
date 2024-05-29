@@ -15,7 +15,7 @@ export default function CreateTransaction() {
     } = useSWR(
         `http://localhost:8080/api/transactions/recent/${user?.id}`,
         fetcher,
-        { refreshInterval: 10000 }
+        { refreshInterval: 5000 }
     );
 
     // User

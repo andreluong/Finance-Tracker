@@ -34,7 +34,8 @@ export default function TransactionForm({ user_id }: { user_id: string }) {
     );
 
     const filterCategoriesByType = () => {
-        return categories.filter((category: Category) => category.type === watchType);
+        let x = categories.filter((category: Category) => category.type === watchType);
+        return x
     }
 
     const onSubmit = async (data: FieldValues) => {

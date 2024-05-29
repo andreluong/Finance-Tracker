@@ -175,9 +175,25 @@ const transaction = {
 }
 
 const category = {
-    getAll: async function() {
-        const q = `
-            SELECT 
+    getAllDynamically: async function(type) {
+        let q = `
+            SELECT *
+            FROM category
+        `;
+        let params = [];
+
+        if (type && type !== 'all') {
+            q += ` WHERE type = $1`
+            params.push(type);
+        }
+
+        const res = await pool.query(q, params);
+        return res.rows;
+    },
+
+    getAllUniqueDynamically: async function(type) {
+        let q = `
+            SELECT
                 DISTINCT ON (value) 
                 id, 
                 name, 
@@ -185,22 +201,26 @@ const category = {
                 icon, 
                 colour, 
                 type
-            FROM 
+            FROM
                 category
+        `;
+        let params = [];
+
+        if (type && type !== 'all') {
+            q += ` WHERE type = $1`
+            params.push(type);
+        }
+
+        q += `
             ORDER BY 
                 value,
-                id
+                id;
         `;
-        const res = await pool.query(q);
+
+        const res = await pool.query(q, params);
         return res.rows;
     },
-
-    getByType: async function(type) {
-        const q = `SELECT * FROM category WHERE type = $1`
-        const res = await pool.query(q, [type]);
-        return res.rows;
-    },
-
+    
     getIdByValue: async function(value) {
         const q = `SELECT id FROM category WHERE value = $1`
         const res = await pool.query(q, [value]);
