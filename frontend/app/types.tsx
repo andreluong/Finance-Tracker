@@ -39,4 +39,5 @@ export type CategoryStat = {
     total: string;
     percentage: string;
     colour: string;
+    type: string;
 }

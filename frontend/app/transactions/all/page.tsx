@@ -12,22 +12,32 @@ export default function AllTransactions() {
     const { isLoaded, isSignedIn, user } = useUser();
     const [type, setType] = useState<string>("all");
     const [category, setCategory] = useState<string>("all");
+    const [period, setPeriod] = useState<string>("allTime");
 
     const {
         data: transactions,
         error: fetchTransactionsError,
-        isLoading: fetchTransactionsLoading
+        isLoading: fetchTransactionsLoading,
     } = useSWR(
-        `http://localhost:8080/api/transactions/all/${user?.id}?type=${type}&category=${category}`, // TODO: On load, user is not defined, so this runs once as an error
+        `http://localhost:8080/api/transactions/all/${user?.id}?type=${type}&category=${category}&period=${period}`, // TODO: On load, user is not defined, so this runs once as an error
         fetcher
     );
 
     const {
         data: categories,
         error: fetchCategoriesError,
-        isLoading: fetchCategoriesLoading
+        isLoading: fetchCategoriesLoading,
     } = useSWR<Category[], Error, any>(
         `http://localhost:8080/api/categories?type=${type}`,
+        fetcher
+    );
+
+    const {
+        data: years,
+        error: fetchYearsError,
+        isLoading: fetchYearsLoading,
+    } = useSWR<string[], Error, any>(
+        `http://localhost:8080/api/transactions/years/${user?.id}`,
         fetcher
     );
 
@@ -40,15 +50,26 @@ export default function AllTransactions() {
         <div>
             <h1 className="font-bold text-3xl pb-4">Transactions</h1>
             <div className="border border-zinc-300 mb-4">
-                <ul className="flex flex-nowrap">
+                <ul className="flex flex-nowrap font-sans">
                     <li className="pr-8">
                         <div className="flex flex-nowrap">
                             <p>Period:&nbsp;</p>
-                            <select>
-                                <option>All Time</option>
-                                <option>This Week</option>
-                                <option>This Month</option>
-                                <option>This Year</option>
+                            <select
+                                value={period}
+                                onChange={(e) => setPeriod(e.target.value)}
+                            >
+                                {fetchYearsError && <option>Error loading periods</option>}
+                                {fetchYearsLoading && <option>Loading periods...</option>}
+                                {years && (
+                                    <>
+                                        <option value="allTime">All Time</option>
+                                        <option value="last7Days">Last 7 days</option>
+                                        <option value="last30Days">Last 30 days</option>
+                                        {years.map((year) => (
+                                            <option key={year} value={year}>{year}</option>
+                                        ))}
+                                    </>
+                                )}
                             </select>
                         </div>
                     </li>
@@ -75,14 +96,27 @@ export default function AllTransactions() {
                                 value={category}
                                 onChange={(e) => setCategory(e.target.value)}
                             >
-                                {fetchCategoriesLoading && <option disabled>Loading...</option>}
-                                {fetchCategoriesError && <option disabled>Error loading categories</option>}
+                                {fetchCategoriesLoading && (
+                                    <option disabled>Loading...</option>
+                                )}
+                                {fetchCategoriesError && (
+                                    <option disabled>
+                                        Error loading categories
+                                    </option>
+                                )}
                                 {categories && (
                                     <>
                                         <option value="all">All</option>
-                                        {categories.map((category: Category) => (
-                                            <option key={category.id} value={category.value}>{category.name}</option>
-                                        ))}
+                                        {categories.map(
+                                            (category: Category) => (
+                                                <option
+                                                    key={category.id}
+                                                    value={category.value}
+                                                >
+                                                    {category.name}
+                                                </option>
+                                            )
+                                        )}
                                     </>
                                 )}
                             </select>
@@ -91,13 +125,11 @@ export default function AllTransactions() {
                 </ul>
             </div>
             <div className="flex flex-wrap mb-4">
-                <CategoryStats type={type} user_id={user.id} />
+                <CategoryStats type={type} period={period} user_id={user.id} />
             </div>
             {fetchTransactionsError && <div>Error loading transactions</div>}
             {fetchTransactionsLoading && <div>Loading...</div>}
-            {transactions && (
-                <Transactions transactions={transactions} />
-            )}
+            {transactions && <Transactions transactions={transactions} />}
         </div>
     );
 }

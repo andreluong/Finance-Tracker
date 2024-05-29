@@ -7,21 +7,19 @@ import CategoryStatsTable from "./category-stats-table";
 
 export default function CategoryStats({
     type,
+    period,
     user_id,
 }: {
     type: string;
+    period: string;
     user_id: string;
 }) {
-    const url = type === "all"
-        ? `http://localhost:8080/api/transactions/category/stats/${user_id}`
-        : `http://localhost:8080/api/transactions/category/stats/${type}/${user_id}`;
-
     const {
         data,
         error,
         isLoading,
     } = useSWR(
-        url,
+        `http://localhost:8080/api/transactions/category/stats/${user_id}?type=${type}&period=${period}`,
         fetcher
     );
 
@@ -38,10 +36,14 @@ export default function CategoryStats({
     const colours = categoryStats.map((category: CategoryStat) => category.colour);
     const labels = categoryStats.map((category: CategoryStat) => category.name);
 
+    // Unique key based on total to force a re-render when total changes
+    const chartKey = `donut-chart-${total}`
+
     return (
         <>
             <div className="flex items-center justify-center w-1/2">
                 <DonutChart
+                    key={chartKey}
                     series={series}
                     colours={colours}
                     labels={labels}

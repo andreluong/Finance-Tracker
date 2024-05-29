@@ -68,9 +68,11 @@ export default function CategoryStatsTable({
                         {rowsToShow.map(
                             (category: CategoryStat, index: React.Key) => (
                                 <tr key={index}>
-                                    <td className="border border-zinc-300 px-6 py-2 text-left flex flex-row">
-                                        <div className={`w-3 h-3 my-auto rounded-full`} style={{ backgroundColor: category.colour }} />
-                                        &nbsp;{category.name}
+                                    <td className="border border-zinc-300 px-6 py-2 text-left">
+                                        <div className=" flex flex-row">
+                                            <div className={`w-3 h-3 my-auto rounded-full`} style={{ backgroundColor: category.colour }} />
+                                            &nbsp;{category.name} {category.name === "Miscellaneous" ? ` (${category.type})` : ""}
+                                        </div>
                                     </td>
                                     <td className="border border-zinc-300 px-6 py-2 text-right">
                                         ${category.total}

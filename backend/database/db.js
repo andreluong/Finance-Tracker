@@ -1,4 +1,5 @@
 const { Pool } = require('pg')
+const utils = require('./utils.js');
 require('dotenv').config({ path: ['.env.local', '.env'] })
 
 const pool = new Pool({
@@ -50,8 +51,8 @@ const transaction = {
         return res.rows;
     },
 
-    getAllByType: async function(type, user_id) {
-        const q = `
+    getAllDynamically: async function(user_id, type, category, period) {
+        let q = `
             SELECT 
                 transaction.id,
                 created_at,
@@ -67,71 +68,54 @@ const transaction = {
                 transaction, category
             WHERE
                 category_id = category.id
-                AND transaction.type = $1
-                AND user_id = $2
-        `
-        const res = await pool.query(q, [type, user_id]);
+                AND user_id = $1
+        `;
+        let params = [user_id];
+
+        if (type && type !== 'all') {
+            console.log("added type " + type)
+            q += ` AND transaction.type = $${params.length + 1}`
+            params.push(type);
+        }
+
+        if (category && category !== 'all') {
+            console.log("added category " + category)
+            q += ` AND category.value = $${params.length + 1}`
+            params.push(category);
+        }
+
+        let { yearQuery, yearPeriod } = utils.getDateForQuery(period);
+        q += yearQuery;
+        if (yearPeriod) {
+            params.push(periodResult.yearPeriod);
+        }
+
+        q += ` ORDER BY date DESC;`
+
+        const res = await pool.query(q, params);
         return res.rows;
     },
 
-    getAllByCategory: async function(category, user_id) {
-        const q = `
-            SELECT 
-                transaction.id,
-                created_at,
-                amount,
-                transaction.name,
-                category.name AS category,
-                category.value AS category_value,
-                description,
-                transaction.type,
-                date,
-                user_id
-            FROM 
-                transaction, category
-            WHERE
-                category_id = category.id
-                AND category.value = $1
-                AND user_id = $2
+    getSumOfAmountsDynamically: async function(user_id, type, period) {
+        let q = `
+            SELECT SUM(amount)
+            FROM transaction
+            WHERE user_id = $1
         `
-        const res = await pool.query(q, [category, user_id]);
-        return res.rows;
-    },
+        let params = [user_id];
 
-    getAllByTypeAndCategory: async function(type, category, user_id) {
-        const q = `
-            SELECT 
-                transaction.id,
-                created_at,
-                amount,
-                transaction.name,
-                category.name AS category,
-                category.value AS category_value,
-                description,
-                transaction.type,
-                date,
-                user_id
-            FROM 
-                transaction, category
-            WHERE
-                category_id = category.id
-                AND transaction.type = $1
-                AND category.value = $2
-                AND user_id = $3
-        `
-        const res = await pool.query(q, [type, category, user_id]);
-        return res.rows;
-    },
+        if (type && type !== 'all') {
+            q += ` AND type = $${params.length + 1}`
+            params.push(type);
+        }
 
-    getSumOfAmounts: async function(user_id) {
-        const q = `SELECT SUM(amount) FROM transaction WHERE user_id = $1`
-        const res = await pool.query(q, [user_id]);
-        return res.rows[0].sum;
-    },
+        let { yearQuery, yearPeriod } = utils.getDateForQuery(period);
+        q += yearQuery;
+        if (yearPeriod) {
+            params.push(periodResult.yearPeriod);
+        }
 
-    getSumOfAmountsOfType: async function(type, user_id) {
-        const q = `SELECT SUM(amount) FROM transaction WHERE type = $1 AND user_id = $2`
-        const res = await pool.query(q, [type, user_id]);
+        const res = await pool.query(q, params);
         return res.rows[0].sum;
     },
 
@@ -162,6 +146,18 @@ const transaction = {
         return res.rows;
     },
 
+    getYears: async function(user_id) {
+        const q = `
+            SELECT date_trunc('year', date) AS year
+            FROM transaction
+            WHERE user_id = $1
+            GROUP BY year
+            ORDER BY year DESC
+        `
+        const res = await pool.query(q, [user_id]);
+        return res.rows.map(row => row.year.toISOString().split('-')[0]);
+    },
+
     updateById: async function(id, transaction) {
         const {name, amount, description, type, date, user_id} = transaction;
         const q = `
@@ -180,7 +176,21 @@ const transaction = {
 
 const category = {
     getAll: async function() {
-        const q = `SELECT * FROM category`;
+        const q = `
+            SELECT 
+                DISTINCT ON (value) 
+                id, 
+                name, 
+                value, 
+                icon, 
+                colour, 
+                type
+            FROM 
+                category
+            ORDER BY 
+                value,
+                id
+        `;
         const res = await pool.query(q);
         return res.rows;
     },
@@ -203,12 +213,11 @@ const category = {
         return res.rows[0].name;
     },
 
-    getTotalAmountPerCategory: async function(user_id) {
-        const q = `
+    getTotalAmountPerCategoryDynamically: async function(user_id, type, period) {
+        let q = `
             SELECT 
                 c.name AS name,
                 c.colour AS colour,
-                c.type AS type,
                 COUNT(t.id) AS count,
                 SUM(t.amount) AS total
             FROM 
@@ -217,38 +226,28 @@ const category = {
                 category c ON t.category_id = c.id
             WHERE
                 t.user_id = $1
-            GROUP BY 
-                c.name,
-                c.colour,
-                c.type
-            ORDER BY 
-                total DESC;
         `
-        const res = await pool.query(q, [user_id]);
-        return res.rows;
-    },
+        let params = [user_id];
 
-    getTotalAmountPerCategoryOfType: async function(type, user_id) {
-        const q = `
-            SELECT 
-                c.name AS name,
-                c.colour AS colour,
-                COUNT(t.id) AS count,
-                SUM(t.amount) AS total
-            FROM 
-                transaction t
-            JOIN 
-                category c ON t.category_id = c.id
-            WHERE
-                t.type = $1
-                AND t.user_id = $2
-            GROUP BY 
+        if (type && type !== 'all') {
+            q += ` AND t.type = $${params.length + 1}`
+            params.push(type);
+        }
+
+        let { yearQuery, yearPeriod } = utils.getDateForQuery(period);
+        q += yearQuery;
+        if (yearPeriod) {
+            params.push(periodResult.yearPeriod);
+        }
+
+        q += ` GROUP BY 
                 c.name,
                 c.colour
             ORDER BY 
                 total DESC;
         `
-        const res = await pool.query(q, [type, user_id]);
+
+        const res = await pool.query(q, params);
         return res.rows;
     }
 }

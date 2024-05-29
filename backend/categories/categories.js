@@ -10,8 +10,7 @@ router.get('/api/categories', async (req, res) => {
 
         if (type === 'all' || type === undefined) {
             categories = await database.category.getAll();
-        } else if (type === 'income' || type === 'expense')
-        {
+        } else if (type === 'income' || type === 'expense') {
             categories = await database.category.getByType(type);
         }
 
