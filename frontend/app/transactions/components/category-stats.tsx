@@ -1,65 +1,56 @@
-import React, { useEffect, useState } from 'react'
-import axios from 'axios'
-import DonutChart from './donut-chart';
-import { CategoryStat } from '@/app/types';
+import React from "react";
+import DonutChart from "./donut-chart";
+import { CategoryStat } from "@/app/types";
+import useSWR from "swr";
+import { fetcher } from "@/app/lib/utils";
+import CategoryStatsTable from "./category-stats-table";
 
-export default function CategoryStats({type, user_id}: {type: string | null, user_id: string}) {
-    const [categoryStats, setCategoryStats] = useState<CategoryStat[]>([]);
-    const [total, setTotal] = useState<number>(0);
+export default function CategoryStats({
+    type,
+    user_id,
+}: {
+    type: string;
+    user_id: string;
+}) {
+    const url = type === "all"
+        ? `http://localhost:8080/api/transactions/category/stats/${user_id}`
+        : `http://localhost:8080/api/transactions/category/stats/${type}/${user_id}`;
 
-    const getCategoryStats = async () => {
-        const url = type 
-            ? `http://localhost:8080/api/transactions/category/stats/${type}/${user_id}`
-            : `http://localhost:8080/api/transactions/category/stats/${user_id}`; 
+    const {
+        data,
+        error,
+        isLoading,
+    } = useSWR(
+        url,
+        fetcher
+    );
 
-        await axios.get(url)
-            .then(response => {
-                setCategoryStats(response.data.stats);
-                setTotal(response.data.sumTotal);
-            })
-            .catch(error => {
-                console.error("Error fetching category stats: ", error.message);
-            });
+    if (error) {
+        return <div>Error loading category stats and total</div>;
     }
 
-    useEffect(() => {
-        getCategoryStats();
-    }, [])
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
 
-    console.log(categoryStats)
+    const { categoryStats, total } = data;
+    const series = categoryStats.map((category: CategoryStat) => Number(category.total));
+    const colours = categoryStats.map((category: CategoryStat) => category.colour);
+    const labels = categoryStats.map((category: CategoryStat) => category.name);
 
     return (
-        <div className='flex flex-wrap mb-4'>
-            <div className='flex items-center justify-center w-1/2'>
-                <DonutChart 
-                    series={categoryStats.map(category => Number(category.total))} 
-                    labels={categoryStats.map(category => category.name)} 
+        <>
+            <div className="flex items-center justify-center w-1/2">
+                <DonutChart
+                    series={series}
+                    colours={colours}
+                    labels={labels}
                     total={total}
                 />
             </div>
-            
-            <div className='w-1/2'>
-                <div className='flex justify-end'>
-                    <table className='table-fixed w-full ml-16'>
-                        <thead>
-                            <tr>
-                                <th className='w-3/6 border border-zinc-300 px-6 py-1 text-left'>Category</th>
-                                <th className='w-1/6 border border-zinc-300 px-6 py-1 text-right'>Total</th>
-                                <th className='w-1/6 border border-zinc-300 px-6 py-1 text-right'>Percentage</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {categoryStats.map((category, index) => (
-                                <tr key={index}>
-                                    <td className='border border-zinc-300 px-6 py-1 text-left'>{category.name}</td>
-                                    <td className='border border-zinc-300 px-6 py-1 text-right'>${category.total}</td>
-                                    <td className='border border-zinc-300 px-6 py-1 text-right'>{category.percentage}%</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+            <div className="w-1/2">
+                <CategoryStatsTable categoryStats={categoryStats} />
             </div>
-        </div>
-    )
+        </>
+    );
 }

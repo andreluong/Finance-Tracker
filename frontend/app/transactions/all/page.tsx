@@ -7,7 +7,6 @@ import Transactions from "../components/transactions";
 import { Category } from "@/app/types";
 import useSWR from "swr";
 import { fetcher } from "@/app/lib/utils";
-import { IsLoadingResponse } from "swr/_internal";
 
 export default function AllTransactions() {
     const { isLoaded, isSignedIn, user } = useUser();
@@ -20,8 +19,7 @@ export default function AllTransactions() {
         isLoading: fetchTransactionsLoading
     } = useSWR(
         `http://localhost:8080/api/transactions/all/${user?.id}?type=${type}&category=${category}`, // TODO: On load, user is not defined, so this runs once as an error
-        fetcher,
-        { refreshInterval: 1000}
+        fetcher
     );
 
     const {
