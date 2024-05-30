@@ -32,35 +32,31 @@ export default function CategoryStats({
         return <div>Loading...</div>;
     }
 
-    const { categoryStats, total } = data;
+    console.log(data)
+    const { categoryStats, incomeTotal, expenseTotal } = data;
     let series: number[] = [];
     let colours: string[] = [];
     let labels: string[] = [];
+    let netTotal = incomeTotal - expenseTotal;
+    let netTotalLabel = "";
 
     if (type === "all") {
-        let income = 0;
-        let expenses = 0;
-
-        categoryStats.forEach((category: CategoryStat) => {
-            if (category.type === "income") {
-                income += Number(category.total);
-            } else {
-                expenses += Number(category.total);
-            }
-        });
-        series = [income, expenses];
+        series = [Number(incomeTotal), Number(expenseTotal)];
         colours = [INCOME.colour, EXPENSES.colour];
         labels = [INCOME.value, EXPENSES.value];
+        netTotalLabel = netTotal >= 0 ? "Net Income" : "Net Loss";
     } else {
         categoryStats.forEach((category: CategoryStat) => {
             series.push(Number(category.total));
             colours.push(category.colour);
             labels.push(category.name);
         });
+        netTotal = type === "expense" ? expenseTotal : incomeTotal;
+        netTotalLabel = netTotal >= 0 ? "Income Total" : "Expense Total";
     }
 
     // Unique key based on total to force a re-render when total changes
-    const chartKey = `donut-chart-${total}`
+    const chartKey = `donut-chart-${netTotal}`
 
     return (
         <>
@@ -70,7 +66,8 @@ export default function CategoryStats({
                     series={series}
                     colours={colours}
                     labels={labels}
-                    total={total}
+                    total={netTotal}
+                    totalLabel={netTotalLabel}
                 />
             </div>
             <div className="w-1/2">

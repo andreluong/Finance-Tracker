@@ -100,12 +100,26 @@ router.get('/api/transactions/category/stats/:user_id', async (req, res) => {
 
         console.log("Getting category stats for all transactions");
 
-        const sumTotal = await database.transaction.getSumOfAmountsDynamically(user_id, type, period);
+        let incomeTotal = 0;
+        let expenseTotal = 0;
+        
+        // Get total income and expense amounts for the user
+        if (type === 'all') {
+            incomeTotal = await database.transaction.getSumOfAmountsDynamically(user_id, 'income', period) || 0;
+            expenseTotal = await database.transaction.getSumOfAmountsDynamically(user_id, 'expense', period) || 0;
+        } else {
+            if (type === 'income') {
+                incomeTotal = await database.transaction.getSumOfAmountsDynamically(user_id, 'income', period) || 0; 
+            } else {
+                expenseTotal = await database.transaction.getSumOfAmountsDynamically(user_id, 'expense', period) || 0; 
+            }
+        }
+        
         const categoryStats = await database.category.getTotalAmountPerCategoryDynamically(user_id, type, period);
 
         // Calculate percentage of transaction amounts for each category
         const stats = categoryStats.map(category => {
-            let percentage = (category.total / sumTotal) * 100;
+            let percentage = (category.total / (incomeTotal + expenseTotal)) * 100; // TODO: sumTotal will be sum of income and expense
             percentage = percentage.toFixed(2);
             return {
                 ...category,
@@ -114,7 +128,7 @@ router.get('/api/transactions/category/stats/:user_id', async (req, res) => {
         });
 
         console.log("Category stats retrieved for all transactions");
-        res.status(200).json({categoryStats: stats, total: sumTotal});
+        res.status(200).json({ categoryStats: stats, incomeTotal, expenseTotal });
     } catch (error) {
         console.error(error.message);
         res.status(500).json({error: "Something went wrong with transaction category stats retrieval"});

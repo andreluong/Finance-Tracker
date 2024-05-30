@@ -6,11 +6,13 @@ export default function DonutChart({
     colours,
     labels,
     total,
+    totalLabel,
 }: {
     series: number[];
     colours: string[];
     labels: string[];
     total: number;
+    totalLabel: string;
 }) {
     const chartState = {
         series: series,
@@ -37,7 +39,7 @@ export default function DonutChart({
                                 fontFamily: "sans-serif",
                                 fontWeight: "bold",
                                 fontSize: "24px",
-                                label: `Total`,
+                                label: totalLabel,
                                 color: "#000000",
                                 formatter: () => `$${total}`,
                             },
