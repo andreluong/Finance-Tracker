@@ -1,33 +1,29 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
 import useSWR from "swr";
 import Transactions from "../components/transactions";
-import { fetcher } from "@/app/lib/utils";
+import { fetcherWithToken } from "@/app/lib/utils";
 import TransactionForm from "./components/transaction-form";
 
 export default function CreateTransaction() {
-    const { isLoaded, isSignedIn, user } = useUser();
+    const { getToken } = useAuth();
+
     const {
         data: recentTransactions,
         error,
         isLoading,
     } = useSWR(
-        `http://localhost:8080/api/transactions/recent/${user?.id}`,
-        fetcher,
+        `http://localhost:8080/api/transactions/recent`,
+        async (url: string) => fetcherWithToken(url, await getToken()),
         { refreshInterval: 5000 }
     );
-
-    // User
-    if (!isLoaded || !isSignedIn) {
-        return null;
-    }
 
     return (
         <div>
             <section>
                 <h1 className="font-bold text-3xl pb-4">Transaction</h1>
-                <TransactionForm user_id={user?.id} />
+                <TransactionForm />
             </section>
             <section>
                 <h2 className="font-bold text-2xl pb-4">Recently Created</h2>

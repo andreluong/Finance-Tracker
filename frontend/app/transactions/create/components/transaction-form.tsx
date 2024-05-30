@@ -1,17 +1,20 @@
 import { fetcher } from "@/app/lib/utils";
 import { Category } from "@/app/types";
+import { useAuth } from "@clerk/nextjs";
 import axios from "axios";
 import React from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import useSWR from "swr";
 
-export default function TransactionForm({ user_id }: { user_id: string }) {
+export default function TransactionForm() {
+    const { getToken } = useAuth();
+
     const {
         register,
         watch,
         handleSubmit,
         formState: { errors, isSubmitting },
-        reset
+        reset,
     } = useForm({
         defaultValues: {
             name: "",
@@ -19,7 +22,7 @@ export default function TransactionForm({ user_id }: { user_id: string }) {
             date: "",
             type: "",
             category: "",
-            description: ""
+            description: "",
         },
     });
     const watchType = watch("type");
@@ -28,24 +31,25 @@ export default function TransactionForm({ user_id }: { user_id: string }) {
         data: categories,
         error,
         isLoading,
-    } = useSWR(
-        `http://localhost:8080/api/categories`,
-        fetcher
-    );
+    } = useSWR(`http://localhost:8080/api/categories`, fetcher);
 
     const filterCategoriesByType = () => {
-        let x = categories.filter((category: Category) => category.type === watchType);
-        return x
-    }
+        let x = categories.filter(
+            (category: Category) => category.type === watchType
+        );
+        return x;
+    };
 
     const onSubmit = async (data: FieldValues) => {
+        const token = await getToken();
         console.log(data);
 
         await axios
-            .post("http://localhost:8080/api/transactions/create", {
-                ...data,
-                user_id,
-            })
+            .post(
+                "http://localhost:8080/api/transactions/create",
+                { ...data },
+                { headers: { Authorization: "Bearer " + token } }
+            )
             .then((response) => {
                 console.log(response.data);
             })
@@ -90,7 +94,8 @@ export default function TransactionForm({ user_id }: { user_id: string }) {
                                     valueAsNumber: true,
                                     min: {
                                         value: 0.01,
-                                        message: "Amount must be greater than 0",
+                                        message:
+                                            "Amount must be greater than 0",
                                     },
                                 })}
                                 placeholder="Amount"
@@ -137,8 +142,12 @@ export default function TransactionForm({ user_id }: { user_id: string }) {
                                 id="type"
                                 className="w-full border border-gray-200 bg-white rounded p-2"
                             >
-                                <option value="income" className="font-sans">Income</option>
-                                <option value="expense" className="font-sans">Expense</option>
+                                <option value="income" className="font-sans">
+                                    Income
+                                </option>
+                                <option value="expense" className="font-sans">
+                                    Expense
+                                </option>
                             </select>
                             {errors.type && (
                                 <p className="text-red-500">
@@ -157,15 +166,17 @@ export default function TransactionForm({ user_id }: { user_id: string }) {
                                 id="category"
                                 className="w-full border border-gray-200 bg-white rounded p-2"
                             >
-                                {filterCategoriesByType().map((category: Category) => (
-                                    <option
-                                        key={category.id}
-                                        value={category.value}
-                                        className="font-sans"
-                                    >
-                                        {category.name}
-                                    </option>
-                                ))}
+                                {filterCategoriesByType().map(
+                                    (category: Category) => (
+                                        <option
+                                            key={category.id}
+                                            value={category.value}
+                                            className="font-sans"
+                                        >
+                                            {category.name}
+                                        </option>
+                                    )
+                                )}
                             </select>
                             {errors.category && (
                                 <p className="text-red-500">

@@ -4,14 +4,13 @@ const cors = require('cors');
 require('dotenv').config({ path: ['.env.local', '.env'] })
 
 const corsOptions = cors({
-    origin: ['http://localhost:3000']
+    origin: process.env.CLIENT_URL,
+    credentials: true
 })
 
 app.use(corsOptions);
 app.use(express.urlencoded({extended: true}))
 app.use(express.json());
-
-
 
 const transactions = require('./transactions/transactions.js');
 app.use(transactions);

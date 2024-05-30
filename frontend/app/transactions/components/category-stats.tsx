@@ -2,26 +2,27 @@ import React from "react";
 import DonutChart from "./donut-chart";
 import { CategoryStat } from "@/app/types";
 import useSWR from "swr";
-import { fetcher } from "@/app/lib/utils";
+import { fetcherWithToken } from "@/app/lib/utils";
 import CategoryStatsTable from "./category-stats-table";
 import { EXPENSES, INCOME } from "@/app/constants";
+import { useAuth } from "@clerk/nextjs";
 
 export default function CategoryStats({
     type,
-    period,
-    user_id,
+    period
 }: {
     type: string;
     period: string;
-    user_id: string;
 }) {
+    const { getToken } = useAuth();
+
     const {
         data,
         error,
         isLoading,
     } = useSWR(
-        `http://localhost:8080/api/transactions/category/stats/${user_id}?type=${type}&period=${period}`,
-        fetcher
+        `http://localhost:8080/api/transactions/category/stats?type=${type}&period=${period}`,
+        async (url: string) => fetcherWithToken(url, await getToken())
     );
 
     if (error) {

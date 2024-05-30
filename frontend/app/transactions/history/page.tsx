@@ -1,15 +1,15 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
 import React, { useState } from "react";
 import CategoryStats from "../components/category-stats";
 import Transactions from "../components/transactions";
 import { Category } from "@/app/types";
 import useSWR from "swr";
-import { fetcher } from "@/app/lib/utils";
+import { fetcher, fetcherWithToken } from "@/app/lib/utils";
 
 export default function AllTransactions() {
-    const { isLoaded, isSignedIn, user } = useUser();
+    const { getToken } = useAuth();
     const [type, setType] = useState<string>("all");
     const [category, setCategory] = useState<string>("all");
     const [period, setPeriod] = useState<string>("allTime");
@@ -19,8 +19,8 @@ export default function AllTransactions() {
         error: fetchTransactionsError,
         isLoading: fetchTransactionsLoading,
     } = useSWR(
-        `http://localhost:8080/api/transactions/all/${user?.id}?type=${type}&category=${category}&period=${period}`, // TODO: On load, user is not defined, so this runs once as an error
-        fetcher
+        `http://localhost:8080/api/transactions/all?type=${type}&category=${category}&period=${period}`,
+        async (url: string) => fetcherWithToken(url, await getToken())
     );
 
     const {
@@ -37,14 +37,9 @@ export default function AllTransactions() {
         error: fetchYearsError,
         isLoading: fetchYearsLoading,
     } = useSWR<string[], Error, any>(
-        `http://localhost:8080/api/transactions/years/${user?.id}`,
-        fetcher
+        "http://localhost:8080/api/transactions/years",
+        async (url: string) => fetcherWithToken(url, await getToken())
     );
-
-    // User
-    if (!isLoaded || !isSignedIn) {
-        return <div>Loading...</div>;
-    }
 
     return (
         <div>
@@ -125,7 +120,7 @@ export default function AllTransactions() {
                 </ul>
             </div>
             <div className="flex flex-wrap mb-4">
-                <CategoryStats type={type} period={period} user_id={user.id} />
+                <CategoryStats type={type} period={period} />
             </div>
             {fetchTransactionsError && <div>Error loading transactions</div>}
             {fetchTransactionsLoading && <div>Loading...</div>}

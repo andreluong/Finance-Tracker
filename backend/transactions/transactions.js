@@ -1,11 +1,13 @@
+require('dotenv').config({ path: ['.env.local', '.env'] })
 const express = require('express');
 const router = express.Router();
 const database = require('../database/db');
+const clerkAuth = require('../middleware/clerkAuth');
 
 // Create a transaction for a user
-router.post('/api/transactions/create', async (req, res) => {
+router.post('/api/transactions/create', clerkAuth, async (req, res) => {
     try {
-        const {name, amount, description, type, category, date, user_id} = req.body;
+        const {name, amount, description, type, category, date} = req.body;
 
         const categoryId = await database.category.getIdByValue(category);
 
@@ -18,7 +20,7 @@ router.post('/api/transactions/create', async (req, res) => {
             type,
             category: categoryId,
             date,
-            user_id
+            user_id: req.auth.userId
         });
         console.log("Transaction created")
         res.status(201).json({message: "Transaction created"});
@@ -29,7 +31,7 @@ router.post('/api/transactions/create', async (req, res) => {
 });
 
 // Get a transaction by id for a user
-router.get('/api/transactions/:id', async (req, res) => {
+router.get('/api/transactions/view/:id', clerkAuth, async (req, res) => {
     try {
         const id = req.params.id;
         // const user_id = req.query.user_id; // TODO:
@@ -44,10 +46,9 @@ router.get('/api/transactions/:id', async (req, res) => {
 });
 
 // Get last 10 transactions for a user
-router.get('/api/transactions/recent/:user_id', async (req, res) => {
+router.get('/api/transactions/recent', clerkAuth, async (req, res) => {
     try {
-        const user_id = req.params.user_id;
-        const transactions = await database.transaction.getRecent(user_id);
+        const transactions = await database.transaction.getRecent(req.auth.userId);
         res.status(200).json(transactions);
     } catch (error) {
         console.error(error.message);
@@ -56,14 +57,13 @@ router.get('/api/transactions/recent/:user_id', async (req, res) => {
 });
 
 // Get all transactions for a user
-router.get('/api/transactions/all/:user_id', async (req, res) => {
+router.get('/api/transactions/all', clerkAuth, async (req, res) => {
     try {
-        const user_id = req.params.user_id; // TODO:
         const type = req.query.type;
         const category = req.query.category;
         const period = req.query.period;
 
-        const transactions = await database.transaction.getAllDynamically(user_id, type, category, period);
+        const transactions = await database.transaction.getAllDynamically(req.auth.userId, type, category, period);
         res.status(200).json(transactions);
     } catch (error) {
         console.error(error.message);
@@ -72,7 +72,7 @@ router.get('/api/transactions/all/:user_id', async (req, res) => {
 });
 
 // Update a transaction by id for a user
-router.put('/api/transactions/:id', async (req, res) => {
+router.put('/api/transactions/update/:id', async (req, res) => {
     try {
         const id = req.params.id;
         const {name, amount, description, type, date, user_id} = req.body;
@@ -92,13 +92,11 @@ router.put('/api/transactions/:id', async (req, res) => {
 });
 
 // Get category stats for all transactions for a user
-router.get('/api/transactions/category/stats/:user_id', async (req, res) => {
+router.get('/api/transactions/category/stats', clerkAuth, async (req, res) => {
     try {
-        const user_id = req.params.user_id;
         const type = req.query.type;
         const period = req.query.period;
-
-        console.log("Getting category stats for all transactions");
+        const user_id = req.auth.userId;
 
         let incomeTotal = 0;
         let expenseTotal = 0;
@@ -127,7 +125,6 @@ router.get('/api/transactions/category/stats/:user_id', async (req, res) => {
             }
         });
 
-        console.log("Category stats retrieved for all transactions");
         res.status(200).json({ categoryStats: stats, incomeTotal, expenseTotal });
     } catch (error) {
         console.error(error.message);
@@ -136,10 +133,9 @@ router.get('/api/transactions/category/stats/:user_id', async (req, res) => {
 })
 
 // Get all years of transactions for a user
-router.get('/api/transactions/years/:user_id', async (req, res) => {
+router.get('/api/transactions/years', clerkAuth, async (req, res) => {
     try {
-        const user_id = req.params.user_id;
-        const years = await database.transaction.getYears(user_id);
+        const years = await database.transaction.getYears(req.auth.userId);
         res.status(200).json(years);
     } catch (error) {
         console.error(error.message);
