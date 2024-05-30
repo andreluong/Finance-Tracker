@@ -103,21 +103,22 @@ router.get('/api/transactions/category/stats', clerkAuth, async (req, res) => {
         
         // Get total income and expense amounts for the user
         if (type === 'all') {
-            incomeTotal = await database.transaction.getSumOfAmountsDynamically(user_id, 'income', period) || 0;
-            expenseTotal = await database.transaction.getSumOfAmountsDynamically(user_id, 'expense', period) || 0;
+            incomeTotal = await database.transaction.getSumOfAmountsDynamically(user_id, 'income', period);
+            expenseTotal = await database.transaction.getSumOfAmountsDynamically(user_id, 'expense', period);
         } else {
             if (type === 'income') {
-                incomeTotal = await database.transaction.getSumOfAmountsDynamically(user_id, 'income', period) || 0; 
+                incomeTotal = await database.transaction.getSumOfAmountsDynamically(user_id, 'income', period); 
             } else {
-                expenseTotal = await database.transaction.getSumOfAmountsDynamically(user_id, 'expense', period) || 0; 
+                expenseTotal = await database.transaction.getSumOfAmountsDynamically(user_id, 'expense', period); 
             }
         }
-        
+
         const categoryStats = await database.category.getTotalAmountPerCategoryDynamically(user_id, type, period);
+        const total = Number(incomeTotal) + Number(expenseTotal);
 
         // Calculate percentage of transaction amounts for each category
         const stats = categoryStats.map(category => {
-            let percentage = (category.total / (incomeTotal + expenseTotal)) * 100; // TODO: sumTotal will be sum of income and expense
+            let percentage = (category.total / total) * 100;
             percentage = percentage.toFixed(2);
             return {
                 ...category,
