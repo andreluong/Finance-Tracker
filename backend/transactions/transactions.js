@@ -71,30 +71,6 @@ router.get('/api/transactions/all/:user_id', async (req, res) => {
     }
 });
 
-// Get all income transactions for a user
-router.get('/api/transactions/income/:user_id', async (req, res) => {
-    try {
-        const user_id = req.params.user_id; // TODO:
-        const transactions = await database.transaction.getAllByType('income', user_id);
-        res.status(200).json(transactions);
-    } catch (error) {
-        console.error(error.message);
-        res.status(500).json({error: "Something went wrong with income transaction retrieval"});
-    }
-});
-
-// Get all expense transactions for a user
-router.get('/api/transactions/expenses/:user_id', async (req, res) => {
-    try {
-        const user_id = req.params.user_id; // TODO:
-        const transactions = await database.transaction.getAllByType('expense', user_id);
-        res.status(200).json(transactions);
-    } catch (error) {
-        console.error(error.message);
-        res.status(500).json({error: "Something went wrong with expenses transaction retrieval"});
-    }
-});
-
 // Update a transaction by id for a user
 router.put('/api/transactions/:id', async (req, res) => {
     try {

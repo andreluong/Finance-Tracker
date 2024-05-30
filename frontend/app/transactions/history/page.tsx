@@ -48,7 +48,7 @@ export default function AllTransactions() {
 
     return (
         <div>
-            <h1 className="font-bold text-3xl pb-4">Transactions</h1>
+            <h1 className="font-bold text-3xl pb-4">Transaction History</h1>
             <div className="border border-zinc-300 mb-4">
                 <ul className="flex flex-nowrap font-sans">
                     <li className="pr-8">

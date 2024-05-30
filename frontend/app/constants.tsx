@@ -14,9 +14,7 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
         icon: <Icon icon="lucide:credit-card" width="24" height="24" />,
         submenu: true,
         subMenuItems: [
-            { title: 'All', path: '/transactions/all' },
-            { title: 'Income', path: '/transactions/income' },
-            { title: 'Expenses', path: '/transactions/expenses' },
+            { title: 'History', path: '/transactions/history' },
             { title: 'Create', path: '/transactions/create' }
         ],
     },
