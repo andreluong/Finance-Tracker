@@ -1,4 +1,4 @@
-function getDateForQuery(period) {
+function getDateForQuery(period, params) {
     let yearQuery = '';
     let yearPeriod = null;
 

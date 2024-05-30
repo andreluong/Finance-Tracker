@@ -84,10 +84,10 @@ const transaction = {
             params.push(category);
         }
 
-        let { yearQuery, yearPeriod } = utils.getDateForQuery(period);
+        let { yearQuery, yearPeriod } = utils.getDateForQuery(period, params);
         q += yearQuery;
         if (yearPeriod) {
-            params.push(periodResult.yearPeriod);
+            params.push(yearPeriod);
         }
 
         q += ` ORDER BY date DESC;`
@@ -109,10 +109,10 @@ const transaction = {
             params.push(type);
         }
 
-        let { yearQuery, yearPeriod } = utils.getDateForQuery(period);
+        let { yearQuery, yearPeriod } = utils.getDateForQuery(period, params);
         q += yearQuery;
         if (yearPeriod) {
-            params.push(periodResult.yearPeriod);
+            params.push(yearPeriod);
         }
 
         const res = await pool.query(q, params);
@@ -255,10 +255,10 @@ const category = {
             params.push(type);
         }
 
-        let { yearQuery, yearPeriod } = utils.getDateForQuery(period);
+        let { yearQuery, yearPeriod } = utils.getDateForQuery(period, params);
         q += yearQuery;
         if (yearPeriod) {
-            params.push(periodResult.yearPeriod);
+            params.push(yearPeriod);
         }
 
         q += ` GROUP BY 
