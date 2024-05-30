@@ -4,6 +4,7 @@ import { CategoryStat } from "@/app/types";
 import useSWR from "swr";
 import { fetcher } from "@/app/lib/utils";
 import CategoryStatsTable from "./category-stats-table";
+import { EXPENSES, INCOME } from "@/app/constants";
 
 export default function CategoryStats({
     type,
@@ -32,9 +33,31 @@ export default function CategoryStats({
     }
 
     const { categoryStats, total } = data;
-    const series = categoryStats.map((category: CategoryStat) => Number(category.total));
-    const colours = categoryStats.map((category: CategoryStat) => category.colour);
-    const labels = categoryStats.map((category: CategoryStat) => category.name);
+    let series: number[] = [];
+    let colours: string[] = [];
+    let labels: string[] = [];
+
+    if (type === "all") {
+        let income = 0;
+        let expenses = 0;
+
+        categoryStats.forEach((category: CategoryStat) => {
+            if (category.type === "income") {
+                income += Number(category.total);
+            } else {
+                expenses += Number(category.total);
+            }
+        });
+        series = [income, expenses];
+        colours = [INCOME.colour, EXPENSES.colour];
+        labels = [INCOME.value, EXPENSES.value];
+    } else {
+        categoryStats.forEach((category: CategoryStat) => {
+            series.push(Number(category.total));
+            colours.push(category.colour);
+            labels.push(category.name);
+        });
+    }
 
     // Unique key based on total to force a re-render when total changes
     const chartKey = `donut-chart-${total}`

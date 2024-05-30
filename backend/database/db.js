@@ -239,7 +239,8 @@ const category = {
                 c.name AS name,
                 c.colour AS colour,
                 COUNT(t.id) AS count,
-                SUM(t.amount) AS total
+                SUM(t.amount) AS total,
+                c.type AS type
             FROM 
                 transaction t
             JOIN 
@@ -262,7 +263,8 @@ const category = {
 
         q += ` GROUP BY 
                 c.name,
-                c.colour
+                c.colour,
+                c.type
             ORDER BY 
                 total DESC;
         `

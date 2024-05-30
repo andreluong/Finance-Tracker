@@ -27,3 +27,17 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
         submenu: false
     }
 ];
+
+export const INCOME = {
+    title: 'Income',
+    value: 'income',
+    icon: <Icon icon="bx:bxs-dollar-circle" width="24" height="24" />,
+    colour: '#00e396',
+};
+
+export const EXPENSES = {
+    title: 'Expenses',
+    value: 'expenses',
+    icon: <Icon icon="bx:bxs-credit-card" width="24" height="24" />,
+    colour: '#ff4560',
+};
