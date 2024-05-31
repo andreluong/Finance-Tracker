@@ -2,8 +2,8 @@
 
 import { useAuth } from "@clerk/nextjs";
 import React, { useState } from "react";
-import CategoryStats from "../components/category-stats";
-import Transactions from "../components/transactions";
+import CategoryStats from "./components/category-stats";
+import Transactions from "./components/transactions";
 import { Category } from "@/app/types";
 import useSWR from "swr";
 import { fetcher, fetcherWithToken } from "@/app/lib/utils";
@@ -43,7 +43,7 @@ export default function AllTransactions() {
 
     return (
         <div>
-            <h1 className="font-bold text-3xl pb-4">Transaction History</h1>
+            <h1 className="font-bold text-3xl pb-4">Transactions</h1>
             <div className="border border-zinc-300 mb-4">
                 <ul className="flex flex-nowrap font-sans">
                     <li className="pr-8">

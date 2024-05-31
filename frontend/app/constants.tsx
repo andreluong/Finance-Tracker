@@ -12,11 +12,13 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
         title: 'Transactions',
         path: '/transactions',
         icon: <Icon icon="lucide:credit-card" width="24" height="24" />,
-        submenu: true,
-        subMenuItems: [
-            { title: 'History', path: '/transactions/history' },
-            { title: 'Create', path: '/transactions/create' }
-        ],
+        submenu: false
+    },
+    {
+        title: 'Create',
+        path: '/transactions/create',
+        icon: <Icon icon="lucide:circle-plus" width="24" height="24" />,
+        submenu: false
     },
     {
         title: 'Settings',
