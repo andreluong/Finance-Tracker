@@ -38,14 +38,14 @@ export default function CategoryStats({
     let series: number[] = [];
     let colours: string[] = [];
     let labels: string[] = [];
-    let netTotal = incomeTotal - expenseTotal;
+    let netTotal = Number(incomeTotal - expenseTotal).toFixed(2);
     let netTotalLabel = "";
 
     if (type === "all") {
         series = [Number(incomeTotal), Number(expenseTotal)];
         colours = [INCOME.colour, EXPENSES.colour];
         labels = [INCOME.value, EXPENSES.value];
-        netTotalLabel = netTotal >= 0 ? "Net Income" : "Net Loss";
+        netTotalLabel = netTotal >= "0" ? "Net Income" : "Net Loss";
     } else {
         categoryStats.forEach((category: CategoryStat) => {
             series.push(Number(category.total));
@@ -53,7 +53,7 @@ export default function CategoryStats({
             labels.push(category.name);
         });
         netTotal = type === "expense" ? expenseTotal : incomeTotal;
-        netTotalLabel = netTotal >= 0 ? "Income Total" : "Expense Total";
+        netTotalLabel = netTotal >= "0" ? "Income Total" : "Expense Total";
     }
 
     // Unique key based on total to force a re-render when total changes

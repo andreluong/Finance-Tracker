@@ -11,7 +11,7 @@ export default function DonutChart({
     series: number[];
     colours: string[];
     labels: string[];
-    total: number;
+    total: string;
     totalLabel: string;
 }) {
     const chartState = {
