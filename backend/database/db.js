@@ -274,5 +274,99 @@ const category = {
     }
 }
 
+// Overview statistics for user
+const overview = {
+    getMonthlyTransactionData: async function(user_id) {
+        const q = `
+            SELECT
+                DATE_PART('month', date) AS month,
+                SUM(amount) AS total_amount,
+                type
+            FROM
+                transaction
+            WHERE
+                EXTRACT(YEAR FROM date) = EXTRACT(YEAR FROM NOW())
+                AND user_id = $1
+            GROUP BY 
+                DATE_PART('month', date),
+                type;
+        `
+        const res = await pool.query(q, [user_id]);
+        return res.rows;
+    },
 
-module.exports = { transaction, category };
+    getMonthlyTopSpendingCategories: async function(user_id) {
+        const q = `
+            SELECT
+                c.name,
+                c.icon,
+                c.colour,
+                SUM(amount) AS total_spent
+            FROM
+                transaction t, category c
+            WHERE
+                t.category_id = c.id
+                AND t.type = 'expense'
+                AND DATE_PART('year', date) = DATE_PART('year', CURRENT_DATE)
+                AND DATE_PART('month', date) = DATE_PART('month', CURRENT_DATE)
+                AND user_id = $1
+            GROUP BY
+                c.name,
+                c.icon,
+                c.colour
+            ORDER BY
+                total_spent DESC
+            LIMIT 4;            
+        `
+        const res = await pool.query(q, [user_id]);
+        return res.rows;
+    },
+
+    getMonthlyFrequentSpendingCategories: async function(user_id) {
+        const q = `
+            SELECT
+                c.name,
+                c.icon,
+                c.colour,
+                COUNT(t.id) AS count
+            FROM
+                transaction t, category c
+            WHERE
+                t.category_id = c.id
+                AND t.type = 'expense'
+                AND DATE_PART('year', date) = DATE_PART('year', CURRENT_DATE)
+                AND DATE_PART('month', date) = DATE_PART('month', CURRENT_DATE)
+                AND user_id = $1
+            GROUP BY
+                c.name,
+                c.icon,
+                c.colour
+            ORDER BY
+                count DESC
+            LIMIT 3;
+        `
+        const res = await pool.query(q, [user_id]);
+        return res.rows;
+    },
+
+    getMonthlyIncomeAndExpense: async function(user_id) {
+        const q = `
+            SELECT
+                type,
+                SUM(amount) AS total
+            FROM
+                transaction
+            WHERE
+                date >= date_trunc('month', CURRENT_DATE)
+                AND date < date_trunc('month', CURRENT_DATE) + INTERVAL '1 month'
+                AND user_id = $1
+            GROUP BY
+                type;
+        `
+        const res = await pool.query(q, [user_id]);
+        return res.rows;
+    }
+}
+
+
+module.exports = { transaction, category, overview };

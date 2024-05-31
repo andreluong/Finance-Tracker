@@ -18,6 +18,9 @@ app.use(transactions);
 const categories = require('./categories/categories.js');
 app.use(categories);
 
+const overview = require('./overview/overview.js');
+app.use(overview);
+
 app.listen(8080, () => {
     console.log('Server is running on port 8080');
 });
