@@ -2,9 +2,11 @@
 
 import { useAuth } from "@clerk/nextjs";
 import useSWR from "swr";
-import Transactions from "../components/transactions";
+import TransactionsTable from "../components/transactions-table";
 import { fetcherWithToken } from "@/app/lib/utils";
 import TransactionForm from "./components/transaction-form";
+import Loader from "@/app/components/loader";
+import CSVForm from "./components/csv-file-form";
 
 export default function CreateTransaction() {
     const { getToken } = useAuth();
@@ -15,24 +17,28 @@ export default function CreateTransaction() {
         isLoading,
     } = useSWR(
         `http://localhost:8080/api/transactions/recent`,
-        async (url: string) => fetcherWithToken(url, await getToken()),
-        { refreshInterval: 5000 }
+        async (url: string) => fetcherWithToken(url, await getToken())
     );
+
+    if (error) throw error || new Error("An error occurred while fetching recent transactions");
+    if (isLoading) return <Loader />;
 
     return (
         <div>
-            <section>
-                <h1 className="font-bold text-3xl pb-4">Transaction</h1>
-                <TransactionForm />
-            </section>
-            <section>
-                <h2 className="font-bold text-2xl pb-4">Recently Created</h2>
-                {error && <div>Error loading recent transactions</div>}
-                {isLoading && <div>Loading...</div>}
-                {recentTransactions && (
-                    <Transactions transactions={recentTransactions} />
-                )}
-            </section>
+            <div className="flex flex-row pb-4 gap-8">
+                <div className="w-3/4 flex flex-col">
+                    <h1 className="font-bold text-3xl pb-4">Create Transaction</h1>
+                    <TransactionForm />
+                </div>
+                <div className="w-1/4 flex flex-col"> 
+                    <h1 className="font-bold text-3xl pb-4">Import CSV</h1>
+                    <CSVForm />
+                </div>
+            </div>
+            <div>
+                <h2 className="font-bold text-2xl pb-4">Recently Created</h2>                
+                <TransactionsTable transactions={recentTransactions} />
+            </div>
         </div>
     );
 }

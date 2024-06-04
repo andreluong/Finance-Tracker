@@ -38,12 +38,13 @@ export default function DonutChart({
                                 show: true,
                                 fontFamily: "sans-serif",
                                 fontWeight: "bold",
-                                fontSize: "24px",
+                                fontSize: "20px",
                                 label: totalLabel,
                                 color: "#000000",
                                 formatter: () => `$${total}`,
                             },
                         },
+                        size: "70%"
                     },
                 },
             },
@@ -65,7 +66,7 @@ export default function DonutChart({
             options={chartState.options}
             series={chartState.series}
             type="donut"
-            width="500"
+            width="450"
         />
     );
 }

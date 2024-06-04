@@ -18,8 +18,7 @@ export type Transaction = {
     name: string;
     description: string;
     type: string;
-    category: string;
-    category_value: string;
+    category: Category;
     date: string;
     user_id: string;
 };

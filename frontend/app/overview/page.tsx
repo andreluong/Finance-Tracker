@@ -58,10 +58,10 @@ export default function Overview() {
         "http://localhost:8080/api/overview/monthly-finances",
         async (url: string) => fetcherWithToken(url, await getToken())
     );
-
+    
     return (
         <div>
-            <h1 className="font-bold text-4xl mb-4">This Month's Overview</h1>
+            <h1 className="font-bold text-3xl mb-4">This Month's Overview</h1>
             {financesLoading && (
                 <div>Loading finance data...</div>
             )}
@@ -114,7 +114,7 @@ export default function Overview() {
                                             {category.name}
                                         </div>
                                         <div className="text-2xl">
-                                            {category.total_spent}
+                                            ${category.total_spent}
                                         </div>
                                     </div>
                                 )

@@ -3,45 +3,71 @@ const express = require('express');
 const router = express.Router();
 const database = require('../database/db');
 const clerkAuth = require('../middleware/clerkAuth');
+const multer  = require('multer')
+const upload = multer({ dest: 'uploads/' })
+const csv = require('csv-parser')
+const fs = require('fs')
 
 // Create a transaction for a user
 router.post('/api/transactions/create', clerkAuth, async (req, res) => {
     try {
         const {name, amount, description, type, category, date} = req.body;
-
-        const categoryId = await database.category.getIdByValue(category);
-
-        console.log("Creating transaction", categoryId)
+        console.log("Creating transaction")
 
         await database.transaction.create({
             name,
             amount,
             description,
             type,
-            category: categoryId,
+            category,
             date,
             user_id: req.auth.userId
         });
         console.log("Transaction created")
-        res.status(201).json({message: "Transaction created"});
+        res.status(201).json({message: "Transaction created", });
     } catch (error) {
         console.error(error.message);
         res.status(500).json({error: "Something went wrong with transaction creation"});
     }
 });
 
-// Get a transaction by id for a user
-router.get('/api/transactions/view/:id', clerkAuth, async (req, res) => {
+// Import transactions for a user
+router.post('/api/transactions/import', clerkAuth, upload.single('file'), async (req, res) => {
     try {
-        const id = req.params.id;
-        // const user_id = req.query.user_id; // TODO:
-        const user_id = "test_user" // TODO:
+        if (!req.file) {
+            return res.status(400).send({ error: 'No file uploaded' });
+        }
+        console.log("Importing file", req.file)
 
-        const transaction = await database.transaction.getById(id, user_id);
-        res.status(200).json(transaction);
+        // Parse CSV file
+        const fileData = [];
+        fs.createReadStream(req.file.path)
+            .pipe(csv())
+            .on('data', (data) => fileData.push(data))
+            .on('end', () => {
+                // Create transactions from file data
+                fileData.map(async (transaction) => {
+                    const {name, amount, description, type, category, date} = transaction;
+                    const categoryId = await database.category.getIdByNameOrValue(category);
+
+                    await database.transaction.create({
+                        name,
+                        amount,
+                        description,
+                        type,
+                        category: categoryId,
+                        date,
+                        user_id: req.auth.userId
+                    });
+                })
+                fs.unlinkSync(req.file.path);
+                console.log('CSV file successfully processed');
+                res.status(201).json({message: "Transaction import completed", });
+            })
+        await database
     } catch (error) {
         console.error(error.message);
-        res.status(500).json({error: "Something went wrong with transaction retrieval"});
+        res.status(500).json({error: "Something went wrong with transaction import"});
     }
 });
 
@@ -136,7 +162,12 @@ router.get('/api/transactions/category/stats', clerkAuth, async (req, res) => {
 // Get all years of transactions for a user
 router.get('/api/transactions/years', clerkAuth, async (req, res) => {
     try {
-        const years = await database.transaction.getYears(req.auth.userId);
+        const yearsData = await database.transaction.getYears(req.auth.userId);
+        const years = yearsData.map(y => ({
+            label: y.year.toString(),
+            value: y.year.toString()
+        }));
+
         res.status(200).json(years);
     } catch (error) {
         console.error(error.message);
@@ -144,5 +175,16 @@ router.get('/api/transactions/years', clerkAuth, async (req, res) => {
     }
 });
 
+// Delete a transaction by id for a user
+router.delete('/api/transactions/:id', clerkAuth, async (req, res) => {
+    try {
+        const id = req.params.id;
+        await database.transaction.deleteById(id, req.auth.userId);
+        res.status(200).json({message: "Transaction deleted"});
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({error: "Something went wrong with transaction deletion"});
+    }
+});
 
 module.exports = router;
