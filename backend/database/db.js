@@ -168,7 +168,7 @@ const transaction = {
         return res.rows;
     },
 
-    updateById: async function(id, transaction) {
+    update: async function(id, transaction) {
         const {name, amount, description, type, date, user_id} = transaction;
         const q = `
             UPDATE transaction

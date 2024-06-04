@@ -12,13 +12,13 @@ app.use(corsOptions);
 app.use(express.urlencoded({extended: true}))
 app.use(express.json());
 
-const transactions = require('./transactions/transactions.js');
+const transactions = require('./routes/transactions.js');
 app.use(transactions);
 
-const categories = require('./categories/categories.js');
+const categories = require('./routes/categories.js');
 app.use(categories);
 
-const overview = require('./overview/overview.js');
+const overview = require('./routes/overview.js');
 app.use(overview);
 
 app.listen(8080, () => {
