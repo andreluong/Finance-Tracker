@@ -14,7 +14,7 @@ router.get('/api/transactions/recent', clerkAuth, transactionsController.getTenR
 
 router.get('/api/transactions/all', clerkAuth, transactionsController.getAllTransactions);
 
-router.put('/api/transactions/update', clerkAuth, transactionsController.updateTransaction);
+router.patch('/api/transactions/update/:id', clerkAuth, transactionsController.updateTransaction);
 
 router.get('/api/transactions/category/stats', clerkAuth, transactionsController.getCategoryStats);
 

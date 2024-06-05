@@ -27,7 +27,7 @@ export type Category = {
     id: number;
     name: string;
     value: string;
-    icon?: JSX.Element;
+    icon?: string;
     colour: string;
     type: string;
 }

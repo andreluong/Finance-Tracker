@@ -67,10 +67,10 @@ const getAllTransactions = (async (req, res) => {
 const updateTransaction = (async (req, res) => {
     const {name, amount, description, type, category, date} = req.body;
     const userId = req.auth.userId;
-    const {id} = req.params;
+    const id = req.params.id;
 
     try {
-        await database.transaction.update(id, {name, amount, description, type, category, date, userId});
+        await database.transaction.update(id, {name, amount, description, type, category, date, user_id: userId});
         res.status(200).json({message: "Transaction updated"});
     } catch (error) {
         console.error(error.message);

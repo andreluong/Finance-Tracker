@@ -169,13 +169,13 @@ const transaction = {
     },
 
     update: async function(id, transaction) {
-        const {name, amount, description, type, date, user_id} = transaction;
+        const {name, amount, description, type, category, date, user_id} = transaction;
         const q = `
             UPDATE transaction
-            SET name = $1, amount = $2, description = $3, type = $4, date = $5
-            WHERE id = $6 AND user_id = $7;
+            SET name = $1, amount = $2, description = $3, type = $4, category_id = $5, date = $6
+            WHERE id = $7 AND user_id = $8;
         `
-        await pool.query(q, [name, amount, description, type, new Date(date), id, user_id]);
+        await pool.query(q, [name, amount, description, type, category, new Date(date), id, user_id]);
     },
 
     deleteById: async function(id, user_id) {
