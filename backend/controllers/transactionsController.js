@@ -27,9 +27,9 @@ const importTransactions = (async (req, res) => {
             .on('end', () => {
                 // Create transactions from file data
                 fileData.map(async (transaction) => {
-                    const {name, amount, description, type, category, date} = transaction;
-                    const categoryId = await database.category.getIdByNameOrValue(category);
-                    transactionsService.createTransaction(name, amount, description, type, categoryId, date, req.auth.userId);
+                    const {Date, Name, Amount, Type, Category, Description} = transaction;
+                    const categoryId = await database.category.getIdByNameOrValue(Category);
+                    transactionsService.createTransaction(Name, Amount, Description, Type, categoryId, Date, req.auth.userId);
                 })
                 fs.unlinkSync(req.file.path);
                 res.status(201).json({message: "Transaction import completed", });

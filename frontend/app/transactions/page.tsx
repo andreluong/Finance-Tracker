@@ -9,6 +9,8 @@ import useSWR from "swr";
 import { fetcher, fetcherWithToken } from "@/app/lib/utils";
 import { Input, Select, SelectItem } from "@nextui-org/react";
 import Loader from "../components/loader";
+import ExportButton from "./components/export-button";
+import ImportButton from "./components/import-button";
 
 type YearProp = {
     label: string;
@@ -22,13 +24,14 @@ export default function AllTransactions() {
     const [categoryId, setCategoryId] = useState<number>(-1);
     const [period, setPeriod] = useState<string>("allTime");
     const [search, setSearch] = useState<string>("");
+    const transactionsURL = `http://localhost:8080/api/transactions/all?type=${type}&category=${categoryId}&period=${period}`;
 
     const {
         data: transactions,
         error: fetchTransactionsError,
         isLoading: fetchTransactionsLoading,
     } = useSWR(
-        `http://localhost:8080/api/transactions/all?type=${type}&category=${categoryId}&period=${period}`,
+        transactionsURL,
         async (url: string) => fetcherWithToken(url, await getToken())
     );
 
@@ -101,58 +104,64 @@ export default function AllTransactions() {
     return (
         <div>
             <h1 className="font-bold text-3xl pb-4">Transactions</h1>
-            <div className="flex flex-nowrap gap-4 w-1/2 mb-4">
-                <Select
-                    items={years}
-                    selectedKeys={[period]}
-                    onChange={(e) => setPeriod(e.target.value)}
-                    label="Period"
-                    variant="faded"
-                    className="w-8/12"
-                >
-                    {(year: YearProp) => (
-                        <SelectItem key={year.value} value={year.value}>
-                            {year.label}
-                        </SelectItem>
-                    )}
-                </Select>
-                <Select
-                    selectedKeys={[type]}
-                    onChange={(e) => {
-                        setType(e.target.value);
-                        setCategoryName("All");
-                        setCategoryId(-1);
-                    }}
-                    label="Type"
-                    variant="faded"
-                    className="w-8/12"
-                >
-                    <SelectItem key="all" value="all">All</SelectItem>
-                    <SelectItem key="income" value="income">Income</SelectItem>
-                    <SelectItem key="expense" value="expense">Expenses</SelectItem>
-                </Select>
-                <Select
-                    items={categories}
-                    selectedKeys={[categoryName]}
-                    onChange={handleCategoryChange}
-                    label="Category"
-                    variant="faded"
-                >
-                    {(category: Category) => (
-                        <SelectItem key={category.name}>
-                            {category.name}
-                        </SelectItem>
-                    )}
-                </Select>
-                <Input 
-                    type="search" 
-                    label="Search" 
-                    variant="faded" 
-                    isClearable
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    onClear={() => setSearch("")}
-                />
+            <div className="flex justify-between w-full mb-4">
+                <div className="flex flex-row gap-4 w-1/2">
+                    <Select
+                        items={years}
+                        selectedKeys={[period]}
+                        onChange={(e) => setPeriod(e.target.value)}
+                        label="Period"
+                        variant="faded"
+                        className="w-8/12"
+                    >
+                        {(year: YearProp) => (
+                            <SelectItem key={year.value} value={year.value}>
+                                {year.label}
+                            </SelectItem>
+                        )}
+                    </Select>
+                    <Select
+                        selectedKeys={[type]}
+                        onChange={(e) => {
+                            setType(e.target.value);
+                            setCategoryName("All");
+                            setCategoryId(-1);
+                        }}
+                        label="Type"
+                        variant="faded"
+                        className="w-8/12"
+                    >
+                        <SelectItem key="all" value="all">All</SelectItem>
+                        <SelectItem key="income" value="income">Income</SelectItem>
+                        <SelectItem key="expense" value="expense">Expenses</SelectItem>
+                    </Select>
+                    <Select
+                        items={categories}
+                        selectedKeys={[categoryName]}
+                        onChange={handleCategoryChange}
+                        label="Category"
+                        variant="faded"
+                    >
+                        {(category: Category) => (
+                            <SelectItem key={category.name}>
+                                {category.name}
+                            </SelectItem>
+                        )}
+                    </Select>
+                    <Input 
+                        type="search" 
+                        label="Search" 
+                        variant="faded" 
+                        isClearable
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        onClear={() => setSearch("")}
+                    />
+                </div>
+                <div className="flex flex-row gap-2">
+                    <ImportButton url={transactionsURL} />              
+                    <ExportButton transactions={filteredTransactions} />
+                </div>
             </div>
             <div className="flex flex-wrap mb-4">
                 <CategoryStats type={type} period={period} />

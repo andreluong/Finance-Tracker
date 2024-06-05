@@ -1,3 +1,4 @@
+import { sendImportTransactionsRequest } from '@/app/lib/api';
 import { useAuth } from '@clerk/nextjs';
 import { Button } from '@nextui-org/react'
 import axios from 'axios';
@@ -22,24 +23,26 @@ export default function CSVForm() {
 
     const onSubmit = async (data: FieldValues) => {
         const token = await getToken();
-
-        const formData = new FormData();
-        formData.append('file', data.file[0]);
-
-        await axios
-            .post("http://localhost:8080/api/transactions/import", formData, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "multipart/form-data"
-                },
-            })
-            .then((response) => console.log(response.data))
-            .catch((error) => console.error(error));
-
+        sendImportTransactionsRequest(data.file[0], "http://localhost:8080/api/transactions/recent", token);
         reset();
+
+        // const formData = new FormData();
+        // formData.append('file', data.file[0]);
+
+        // await axios
+        //     .post("http://localhost:8080/api/transactions/import", formData, {
+        //         headers: {
+        //             Authorization: `Bearer ${token}`,
+        //             "Content-Type": "multipart/form-data"
+        //         },
+        //     })
+        //     .then((response) => console.log(response.data))
+        //     .catch((error) => console.error(error));
+
+        // reset();
         
-        // Refresh the recent transactions
-        mutate("http://localhost:8080/api/transactions/recent");
+        // // Refresh the recent transactions
+        // mutate("http://localhost:8080/api/transactions/recent");
     }
 
     return (
