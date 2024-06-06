@@ -1,13 +1,13 @@
-import { Category, Transaction } from '@/app/types';
+import { Transaction } from '@/app/types';
 import { Button, DatePicker, Input, Select, SelectItem, Textarea } from '@nextui-org/react';
 import React from 'react'
 import { Controller, FieldValues, useForm } from 'react-hook-form';
 import { parseAbsoluteToLocal } from "@internationalized/date";
-import useSWR, { mutate } from 'swr';
-import { fetcher } from '@/app/lib/utils';
-import Loader from '@/app/components/loader';
 import { useAuth } from '@clerk/nextjs';
 import axios from 'axios';
+import CategorySelection from './category-selection';
+import { useTransactionURL } from '@/app/lib/transction-url-context';
+import { mutate } from 'swr';
 
 export default function TransactionFormModal({
     transaction,
@@ -19,6 +19,7 @@ export default function TransactionFormModal({
     onOpenChange: () => void;
 }) {
     const { getToken } = useAuth();
+    const { URL } = useTransactionURL();
 
     const {
         control,
@@ -36,17 +37,7 @@ export default function TransactionFormModal({
         }
     })
     const watchType = watch("type");
-
-    const {
-        data: categories,
-        error: categoriesError,
-        isLoading: categoriesIsLoading,
-    } = useSWR(`http://localhost:8080/api/categories?type=${watchType}`, fetcher);
-
-    
-    if (categoriesError) throw categoriesError || new Error("Failed to load categories");
-    if (categoriesIsLoading) return <Loader />;
-    
+        
     const onSubmit = async (data: FieldValues) => {
         const token = await getToken();
         
@@ -63,9 +54,7 @@ export default function TransactionFormModal({
             .then((response) => console.log(response.data))
             .catch((error) => console.error(error));
 
-        // Refresh the recent transactions
-        mutate("http://localhost:8080/api/transactions/all");
-
+        mutate(URL);
         onOpenChange();
     };
 
@@ -169,21 +158,7 @@ export default function TransactionFormModal({
                     name="category"
                     control={control}
                     render={({ field }) => (
-                        <Select
-                            {...field}
-                            selectedKeys={[field.value]}
-                            label="Category"
-                            id="category"
-                            className="w-2/3"
-                            variant="faded"
-                            isRequired
-                        >
-                            {categories.map((category: Category) => (
-                                <SelectItem value={category.id} key={category.id}>
-                                    {category.name}
-                                </SelectItem>
-                            ))}
-                        </Select>
+                        <CategorySelection field={field} type={watchType} />
                     )}
                 />
             </div>

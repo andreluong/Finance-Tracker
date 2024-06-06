@@ -11,6 +11,7 @@ import { Input, Select, SelectItem } from "@nextui-org/react";
 import Loader from "../components/loader";
 import ExportButton from "./components/export-button";
 import ImportButton from "./components/import-button";
+import TransactionURLProvider from "../lib/transction-url-context";
 
 type YearProp = {
     label: string;
@@ -166,7 +167,9 @@ export default function AllTransactions() {
             <div className="flex flex-wrap mb-4">
                 <CategoryStats type={type} period={period} />
             </div>
-            <TransactionsTable transactions={filteredTransactions} />
+            <TransactionURLProvider defaultURL={transactionsURL}>
+                <TransactionsTable transactions={filteredTransactions} />
+            </TransactionURLProvider>
         </div>
     );
 }

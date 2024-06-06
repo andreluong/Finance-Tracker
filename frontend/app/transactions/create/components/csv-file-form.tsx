@@ -1,14 +1,13 @@
 import { sendImportTransactionsRequest } from '@/app/lib/api';
+import { useTransactionURL } from '@/app/lib/transction-url-context';
 import { useAuth } from '@clerk/nextjs';
 import { Button } from '@nextui-org/react'
-import axios from 'axios';
 import React from 'react'
 import { FieldValues, useForm } from 'react-hook-form';
-import { useSWRConfig } from 'swr';
 
 export default function CSVForm() {
     const { getToken } = useAuth();
-    const { mutate } = useSWRConfig();
+    const { URL } = useTransactionURL();
 
     const {
         register,
@@ -23,26 +22,8 @@ export default function CSVForm() {
 
     const onSubmit = async (data: FieldValues) => {
         const token = await getToken();
-        sendImportTransactionsRequest(data.file[0], "http://localhost:8080/api/transactions/recent", token);
+        sendImportTransactionsRequest(data.file[0], URL, token);
         reset();
-
-        // const formData = new FormData();
-        // formData.append('file', data.file[0]);
-
-        // await axios
-        //     .post("http://localhost:8080/api/transactions/import", formData, {
-        //         headers: {
-        //             Authorization: `Bearer ${token}`,
-        //             "Content-Type": "multipart/form-data"
-        //         },
-        //     })
-        //     .then((response) => console.log(response.data))
-        //     .catch((error) => console.error(error));
-
-        // reset();
-        
-        // // Refresh the recent transactions
-        // mutate("http://localhost:8080/api/transactions/recent");
     }
 
     return (

@@ -1,17 +1,18 @@
 import { INCOME, EXPENSES } from '@/app/constants'
 import { Button, Divider, ModalBody, ModalFooter, ModalHeader, Textarea } from '@nextui-org/react'
-import React from 'react'
 import CategoryChip from './category-chip'
 import { Transaction } from '@/app/types';
 import { useAuth } from '@clerk/nextjs';
 import axios from 'axios';
+import { mutate } from 'swr';
+import { useTransactionURL } from '@/app/lib/transction-url-context';
 
 export default function TransactionViewModal({
     transaction,
     confirmDelete,
     setConfirmDelete,
     setEditMode,
-    onOpenChange
+    onOpenChange,
 }: {
     transaction: Transaction;
     confirmDelete: boolean;
@@ -20,7 +21,8 @@ export default function TransactionViewModal({
     onOpenChange: () => void;
 }) {
     const { getToken } = useAuth();
-
+    const { URL } = useTransactionURL();
+    
     const handleDelete = async () => {
         if (confirmDelete) {
             const token = await getToken();
@@ -32,7 +34,7 @@ export default function TransactionViewModal({
                 .then((res) => console.log(res.data))
                 .catch((err) => console.log(err));
 
-            // Close modal
+            mutate(URL);
             onOpenChange();
         }
     };
