@@ -1,11 +1,12 @@
 'use client'
 
 import React from 'react'
-import useScroll from '../hooks/use-scroll'
+import useScroll from '../../hooks/use-scroll'
 import { useSelectedLayoutSegment } from 'next/navigation';
 import Link from 'next/link';
-import { cn } from '../lib/utils';
+import { cn } from '../../lib/utils';
 import { SignedIn, UserButton } from '@clerk/nextjs';
+import { Icon } from '@iconify/react/dist/iconify.js';
 
 export default function Header() {
     const scrolled = useScroll(5);
@@ -27,7 +28,7 @@ export default function Header() {
                         href="/"
                         className="flex flex-row space-x-3 items-center justify-center md:hidden"
                     >
-                        <span className="h-7 w-7 bg-zinc-300 rounded-lg" />
+                        <Icon icon="material-symbols:azm-rounded" color='#34d399' fontSize={30} />
                         <span className="font-bold text-xl flex ">Finance Tracker</span>
                     </Link>
                 </div>

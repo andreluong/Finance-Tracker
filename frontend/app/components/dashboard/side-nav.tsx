@@ -1,9 +1,10 @@
 "use client";
 
-import { SIDENAV_ITEMS } from "../constants";
+import { SIDENAV_ITEMS } from "../../constants";
 import Link from "next/link";
-import { SideNavItem } from "../types";
+import { SideNavItem } from "../../types";
 import { usePathname } from "next/navigation";
+import { Icon } from "@iconify/react/dist/iconify.js";
 
 export default function Sidenav() {
     return (
@@ -13,8 +14,7 @@ export default function Sidenav() {
                     href="/"
                     className="flex flex-row space-x-3 items-center justify-center md:justify-start md:px-6 border-b border-zinc-200 h-[51px] w-full"
                 >
-                    {/* TODO: Logo */}
-                    <span className="h-7 w-7 bg-emerald-400 rounded-lg" />
+                    <Icon icon="material-symbols:azm-rounded" color='#34d399' fontSize={30} />
                     <span className="font-bold text-xl hidden md:flex">
                         Finance Tracker
                     </span>

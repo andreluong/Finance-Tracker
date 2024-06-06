@@ -6,7 +6,7 @@ import { fetcherWithToken } from "@/app/lib/utils";
 import CategoryStatsTable from "./category-stats-table";
 import { EXPENSES, INCOME } from "@/app/constants";
 import { useAuth } from "@clerk/nextjs";
-import Loader from "@/app/components/loader";
+import Loader from "@/app/components/dashboard/loader";
 
 export default function CategoryStats({
     type,

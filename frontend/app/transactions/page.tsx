@@ -8,7 +8,7 @@ import { Category, Transaction } from "@/app/types";
 import useSWR from "swr";
 import { fetcher, fetcherWithToken } from "@/app/lib/utils";
 import { Input, Select, SelectItem } from "@nextui-org/react";
-import Loader from "../components/loader";
+import Loader from "../components/dashboard/loader";
 import ExportButton from "./components/export-button";
 import ImportButton from "./components/import-button";
 import TransactionURLProvider from "../lib/transction-url-context";

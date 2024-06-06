@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider, SignedIn, SignedOut } from "@clerk/nextjs";
-import Header from "./components/header";
-import Sidenav from "./components/side-nav";
-import PageWrapper from "./components/page-wrapper";
-import MarginWidthWrapper from "./components/margin-width-wrapper";
+import Header from "./components/dashboard/header";
+import Sidenav from "./components/dashboard/side-nav";
+import PageWrapper from "./components/dashboard/page-wrapper";
+import MarginWidthWrapper from "./components/dashboard/margin-width-wrapper";
 import { Providers } from "./providers";
 
 const inter = Inter({ subsets: ["latin"] });

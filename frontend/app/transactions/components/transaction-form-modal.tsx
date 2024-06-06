@@ -141,7 +141,7 @@ export default function TransactionFormModal({
                             selectedKeys={[field.value]}
                             label="Type"
                             id="type"
-                            className="w-1/3"
+                            className="w-2/5"
                             variant="faded"
                             isRequired
                         >

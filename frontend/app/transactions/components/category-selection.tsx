@@ -1,4 +1,5 @@
-import Loader from '@/app/components/loader';
+
+import Loader from '@/app/components/dashboard/loader';
 import { fetcher } from '@/app/lib/utils';
 import { Category } from '@/app/types';
 import { Select, SelectItem } from '@nextui-org/react'

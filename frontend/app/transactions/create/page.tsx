@@ -5,7 +5,7 @@ import useSWR from "swr";
 import TransactionsTable from "../components/transactions-table";
 import { fetcherWithToken } from "@/app/lib/utils";
 import TransactionForm from "./components/transaction-form";
-import Loader from "@/app/components/loader";
+import Loader from "@/app/components/dashboard/loader";
 import CSVForm from "./components/csv-file-form";
 import TransactionURLProvider from "@/app/lib/transction-url-context";
 
