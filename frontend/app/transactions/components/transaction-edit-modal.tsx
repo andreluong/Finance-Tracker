@@ -20,7 +20,11 @@ export default function TransactionEditModal({
                 </p>
             </ModalHeader>
             <ModalBody className='mb-2'>
-                <TransactionFormModal transaction={transaction} setEditMode={setEditMode} onOpenChange={onOpenChange} />
+                <TransactionFormModal 
+                    transaction={transaction} 
+                    setEditMode={setEditMode} 
+                    onOpenChange={onOpenChange} 
+                />
             </ModalBody>
         </>
     )

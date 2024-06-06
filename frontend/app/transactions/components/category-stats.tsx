@@ -6,6 +6,7 @@ import { fetcherWithToken } from "@/app/lib/utils";
 import CategoryStatsTable from "./category-stats-table";
 import { EXPENSES, INCOME } from "@/app/constants";
 import { useAuth } from "@clerk/nextjs";
+import Loader from "@/app/components/loader";
 
 export default function CategoryStats({
     type,
@@ -25,35 +26,40 @@ export default function CategoryStats({
         async (url: string) => fetcherWithToken(url, await getToken())
     );
 
-    if (error) {
-        return <div>Error loading category stats and total</div>;
-    }
+    if (error) throw error || new Error("An error occurred while fetching category stats and total");
+    if (isLoading) return <Loader />;
 
-    if (isLoading) {
-        return <div>Loading...</div>;
-    }
+    const calculateNetTotal = (income: number, expense: number) => Number(income - expense).toFixed(2);
 
-    console.log(data)
+    const determineNetTotalLabel = (type: string, netTotal: string) => {
+        return type === "all"
+            ? "Net Income"
+            : Number(netTotal) >= 0
+                ? "Income Total"
+                : "Expense Total";
+    };
+
     const { categoryStats, incomeTotal, expenseTotal } = data;
+
     let series: number[] = [];
     let colours: string[] = [];
     let labels: string[] = [];
-    let netTotal = Number(incomeTotal - expenseTotal).toFixed(2);
-    let netTotalLabel = "";
+    let netTotal = calculateNetTotal(incomeTotal, expenseTotal);
+    let netTotalLabel = determineNetTotalLabel(type, netTotal);
 
     if (type === "all") {
+        // Show only income and expenses
         series = [Number(incomeTotal), Number(expenseTotal)];
         colours = [INCOME.colour, EXPENSES.colour];
         labels = [INCOME.value, EXPENSES.value];
-        netTotalLabel = netTotal >= "0" ? "Net Income" : "Net Loss";
     } else {
+        // Show all categories
         categoryStats.forEach((category: CategoryStat) => {
             series.push(Number(category.total));
             colours.push(category.colour);
             labels.push(category.name);
         });
         netTotal = type === "expense" ? expenseTotal : incomeTotal;
-        netTotalLabel = netTotal >= "0" ? "Income Total" : "Expense Total";
     }
 
     // Unique key based on total to force a re-render when total changes
@@ -61,7 +67,7 @@ export default function CategoryStats({
 
     return (
         <>
-            <div className="flex items-center justify-center w-1/2">
+            <div className="flex items-center justify-center w-3/5">
                 <DonutChart
                     key={chartKey}
                     series={series}
@@ -71,7 +77,7 @@ export default function CategoryStats({
                     totalLabel={netTotalLabel}
                 />
             </div>
-            <div className="w-1/2">
+            <div className="w-2/5">
                 <CategoryStatsTable categoryStats={categoryStats} />
             </div>
         </>

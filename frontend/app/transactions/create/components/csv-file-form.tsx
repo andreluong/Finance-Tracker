@@ -44,20 +44,22 @@ export default function CSVForm() {
                     <li>date</li>
                 </ul>
             </div>
-            <div>
-                <input 
-                    {...register("file", { required: "File is required" })}
-                    type="file" 
-                    name="file"
-                    accept=".csv"
-                />
-                {errors.file && (
-                    <p className="text-red-500">{errors.file.message}</p>
-                )}
-            </div>
-
-            <div className="pt-4">
-                <Button type="submit" className="bg-emerald-100 font-bold py-2 px-4 hover:bg-emerald-400">Upload</Button>
+            <input 
+                {...register("file", { required: "File is required" })}
+                type="file" 
+                name="file"
+                accept=".csv"
+            />
+            {errors.file && (
+                <p className="text-red-500">{errors.file.message}</p>
+            )}
+            <div className="flex justify-end pt-4">
+                <Button 
+                    type="submit" 
+                    className="bg-emerald-100 font-bold py-2 px-4 hover:bg-emerald-400"
+                >
+                    Upload
+                </Button>
             </div>
         </form>
     )

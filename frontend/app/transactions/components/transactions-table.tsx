@@ -11,8 +11,32 @@ type HeaderColumn = {
     alignment?: "text-right"
 };
 
+const columns: HeaderColumn[] = [
+    {
+        key: "date",
+        name: "Date"
+    },
+    {
+        key: "transaction",
+        name: "Transaction"
+    },
+    {
+        key: "amount",
+        name: "Amount",
+        alignment: "text-right"
+    },
+    {
+        key: "type",
+        name: "Type"
+    },
+    {
+        key: "category",
+        name: "Category"
+    },
+];
+
 export default function TransactionsTable({
-    transactions,
+    transactions
 }: {
     transactions: Transaction[];
 }) {
@@ -30,30 +54,6 @@ export default function TransactionsTable({
         return transactions.slice(start, end);
     }, [page, transactions]);
     
-    const columns: HeaderColumn[] = [
-        {
-            key: "date",
-            name: "Date"
-        },
-        {
-            key: "transaction",
-            name: "Transaction"
-        },
-        {
-            key: "amount",
-            name: "Amount",
-            alignment: "text-right"
-        },
-        {
-            key: "type",
-            name: "Type"
-        },
-        {
-            key: "category",
-            name: "Category"
-        },
-    ];
-
     return (
         <>
             <Table

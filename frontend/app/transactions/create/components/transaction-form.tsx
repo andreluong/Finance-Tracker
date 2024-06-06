@@ -1,10 +1,8 @@
-import { fetcher } from "@/app/lib/utils";
-import { Category } from "@/app/types";
 import { useAuth } from "@clerk/nextjs";
 import axios from "axios";
 import React from "react";
 import { FieldValues, useForm, Controller } from "react-hook-form";
-import useSWR, { useSWRConfig } from "swr";
+import { useSWRConfig } from "swr";
 import {
     Input,
     DatePicker,
@@ -13,11 +11,13 @@ import {
     Textarea,
     Button,
 } from "@nextui-org/react";
-import Loader from "@/app/components/loader";
+import CategorySelection from "../../components/category-selection";
+import { useTransactionURL } from "@/app/lib/transction-url-context";
 
 export default function TransactionForm() {
     const { getToken } = useAuth();
     const { mutate } = useSWRConfig();
+    const { URL } = useTransactionURL();
 
     const {
         control,
@@ -37,19 +37,6 @@ export default function TransactionForm() {
     });
     const watchType = watch("type");
 
-    const {
-        data: categories,
-        error,
-        isLoading,
-    } = useSWR(`http://localhost:8080/api/categories`, fetcher);
-
-    const filterCategoriesByType = () => {
-        let x = categories.filter(
-            (category: Category) => category.type === watchType
-        );
-        return x;
-    };
-
     const onSubmit = async (data: FieldValues) => {
         const token = await getToken();
 
@@ -63,42 +50,83 @@ export default function TransactionForm() {
                 { ...data },
                 { headers: { Authorization: `Bearer ${token}` } }
             )
-            .then((response) => {
-                console.log(response.data);
-            })
+            .then((response) => console.log(response.data))
             .catch((error) => console.error(error));
 
         reset();
-
-        // Refresh the recent transactions
-        mutate("http://localhost:8080/api/transactions/recent");
+        mutate(URL);
     };
-
-    if (error) throw error;
-    if (isLoading) return <Loader />;
 
     return (
         <form
             onSubmit={handleSubmit(onSubmit)}
             className="w-full flex flex-col flex-grow justify-center border border-zinc-200 rounded-lg bg-white p-4 space-y-4"
         >
-            <div>
+            <Controller
+                name="name"
+                control={control}
+                rules={{ required: "Name is required" }}
+                render={({ field }) => (
+                    <Input
+                        {...field}
+                        label="Name"
+                        type="text"
+                        id="name"
+                        className="w-full"
+                        variant="faded"
+                        isRequired
+                        validate={() => {
+                            if (errors.name) {
+                                return errors.name.message;
+                            }
+                        }}
+                    />
+                )}
+            />
+            <div className="flex">
                 <Controller
-                    name="name"
+                    name="amount"
                     control={control}
-                    rules={{ required: "Name is required" }}
+                    rules={{
+                        required: "Amount is required",
+                        min: {
+                            value: 0.01,
+                            message: "Amount must be greater than 0",
+                        },
+                    }}
                     render={({ field }) => (
                         <Input
                             {...field}
-                            label="Name"
-                            type="text"
-                            id="name"
-                            className="w-full"
+                            label="Amount"
+                            type="number"
+                            id="amount"
+                            step={0.01}
+                            min={0.01}
+                            className="w-2/3 pr-4"
                             variant="faded"
                             isRequired
                             validate={() => {
-                                if (errors.name) {
-                                    return errors.name.message;
+                                if (errors.amount) {
+                                    return errors.amount.message;
+                                }
+                            }}
+                        />
+                    )}
+                />
+                <Controller
+                    name="date"
+                    control={control}
+                    rules={{ required: "Date is required" }}
+                    render={({ field }) => (
+                        <DatePicker
+                            {...field}
+                            label="Date"
+                            className="w-1/3"
+                            variant="faded"
+                            isRequired
+                            validate={() => {
+                                if (errors.date) {
+                                    return errors.date.message;
                                 }
                             }}
                         />
@@ -106,128 +134,52 @@ export default function TransactionForm() {
                 />
             </div>
             <div className="flex">
-                <div className="w-2/3 pr-4">
-                    <Controller
-                        name="amount"
-                        control={control}
-                        rules={{
-                            required: "Amount is required",
-                            min: {
-                                value: 0.01,
-                                message: "Amount must be greater than 0",
-                            },
-                        }}
-                        render={({ field }) => (
-                            <Input
-                                {...field}
-                                label="Amount"
-                                type="number"
-                                id="amount"
-                                step={0.01}
-                                min={0.01}
-                                className="w-full"
-                                variant="faded"
-                                isRequired
-                                validate={() => {
-                                    if (errors.amount) {
-                                        return errors.amount.message;
-                                    }
-                                }}
-                            />
-                        )}
-                    />
-                </div>
-                <div className="w-1/3">
-                    <Controller
-                        name="date"
-                        control={control}
-                        rules={{ required: "Date is required" }}
-                        render={({ field }) => (
-                            <DatePicker
-                                {...field}
-                                label="Date"
-                                className="w-full"
-                                variant="faded"
-                                isRequired
-                                validate={() => {
-                                    if (errors.date) {
-                                        return errors.date.message;
-                                    }
-                                }}
-                            />
-                        )}
-                    />
-                </div>
-            </div>
-            <div className="flex">
-                <div className="w-1/3 pr-4">
-                    <Controller
-                        name="type"
-                        control={control}
-                        render={({ field }) => (
-                            <Select
-                                {...field}
-                                label="Type"
-                                id="type"
-                                className="w-full"
-                                variant="faded"
-                                isRequired
-                            >
-                                <SelectItem value="income" key="income">
-                                    Income
-                                </SelectItem>
-                                <SelectItem value="expense" key="expense">
-                                    Expense
-                                </SelectItem>
-                            </Select>
-                        )}
-                    />
-                </div>
+                <Controller
+                    name="type"
+                    control={control}
+                    render={({ field }) => (
+                        <Select
+                            {...field}
+                            label="Type"
+                            id="type"
+                            className="w-1/3 pr-4"
+                            variant="faded"
+                            isRequired
+                        >
+                            <SelectItem value="income" key="income">
+                                Income
+                            </SelectItem>
+                            <SelectItem value="expense" key="expense">
+                                Expense
+                            </SelectItem>
+                        </Select>
+                    )}
+                />
                 <div className="w-1/3 pr-4">
                     <Controller
                         name="category"
                         control={control}
                         render={({ field }) => (
-                            <Select
-                                {...field}
-                                label="Category"
-                                id="category"
-                                className="w-full"
-                                variant="faded"
-                                isRequired
-                            >
-                                {filterCategoriesByType().map(
-                                    (category: Category) => (
-                                        <SelectItem
-                                            value={category.id}
-                                            key={category.id}
-                                        >
-                                            {category.name}
-                                        </SelectItem>
-                                    )
-                                )}
-                            </Select>
+                            <CategorySelection field={field} type={watchType} />
                         )}
                     />
                 </div>
             </div>
-            <div>
-                <Controller
-                    name="description"
-                    control={control}
-                    render={({ field }) => (
-                        <Textarea
-                            {...field}
-                            label="Description"
-                            id="description"
-                            className="w-full"
-                            variant="faded"
-                            maxRows={5}
-                        />
-                    )}
-                />
-            </div>
-            <div>
+            <Controller
+                name="description"
+                control={control}
+                render={({ field }) => (
+                    <Textarea
+                        {...field}
+                        label="Description"
+                        id="description"
+                        className="w-full"
+                        variant="faded"
+                        maxRows={5}
+                    />
+                )}
+            />
+            <div className="flex justify-end">
                 <Button
                     disabled={isSubmitting}
                     type="submit"

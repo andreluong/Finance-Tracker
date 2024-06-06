@@ -42,60 +42,58 @@ export default function CategoryStatsTable({
     ]
 
     return (
-        <div className="ml-28">
-            <div className="flex justify-end">
-                <Table
-                    bottomContent={
-                        items.length > 0 && (
-                            <div className="flex justify-center">
-                                <Pagination
-                                    isCompact
-                                    showControls
-                                    color="primary"
-                                    page={page}
-                                    total={totalPages}
-                                    onChange={(page) => setPage(page)}
-                                />
-                            </div>
-                        )
-                    }
-                >
-                    <TableHeader columns={columns}>
-                        {(column: HeaderColumn) => (
-                            <TableColumn
-                                key={column.key}
-                                className={column.alignment}
-                            >
-                                {column.name}
-                            </TableColumn>
-                        )}
-                    </TableHeader>
-                    <TableBody items={items}>
-                        {(category: CategoryStat) => (
-                            <TableRow key={category.name}>
-                                <TableCell>
-                                    <div className="flex flex-row">
-                                        <div
-                                            className={`w-3 h-3 my-auto rounded-full`}
-                                            style={{
-                                                backgroundColor:
-                                                    category.colour,
-                                            }}
-                                        />
-                                        &nbsp;{category.name}
-                                    </div>
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    ${category.total}
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    {category.percentage}%
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
+        <div className="flex justify-end">
+            <Table
+                bottomContent={
+                    items.length > 0 && (
+                        <div className="flex justify-center">
+                            <Pagination
+                                isCompact
+                                showControls
+                                color="primary"
+                                page={page}
+                                total={totalPages}
+                                onChange={(page) => setPage(page)}
+                            />
+                        </div>
+                    )
+                }
+            >
+                <TableHeader columns={columns}>
+                    {(column: HeaderColumn) => (
+                        <TableColumn
+                            key={column.key}
+                            className={column.alignment}
+                        >
+                            {column.name}
+                        </TableColumn>
+                    )}
+                </TableHeader>
+                <TableBody items={items}>
+                    {(category: CategoryStat) => (
+                        <TableRow key={category.name}>
+                            <TableCell>
+                                <div className="flex flex-row">
+                                    <div
+                                        className={`w-3 h-3 my-auto rounded-full`}
+                                        style={{
+                                            backgroundColor:
+                                                category.colour,
+                                        }}
+                                    />
+                                    &nbsp;{category.name}
+                                </div>
+                            </TableCell>
+                            <TableCell className="text-right">
+                                ${category.total}
+                            </TableCell>
+                            <TableCell className="text-right">
+                                {category.percentage}%
+                            </TableCell>
+                        </TableRow>
+                    )}
+                </TableBody>
+            </Table>
         </div>
     );
 }

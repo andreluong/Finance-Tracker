@@ -23,7 +23,7 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
     {
         title: 'Analytics',
         path: '/analytics',
-        icon: <Icon icon="lucide:line-chart" width="24" height="24" />,
+        icon: <Icon icon="lucide:bar-chart-3" width="24" height="24" />,
         submenu: false
     },
     {
@@ -43,13 +43,13 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
 export const INCOME = {
     title: 'Income',
     value: 'income',
-    icon: <Icon icon="bx:bxs-dollar-circle" width="24" height="24" color='green' />,
+    icon: <Icon icon="bx:bxs-dollar-circle" width="28" height="28" color='green' />,
     colour: '#00e396',
 };
 
 export const EXPENSES = {
     title: 'Expenses',
     value: 'expenses',
-    icon: <Icon icon="bx:bxs-credit-card" width="24" height="24" color='red' />,
+    icon: <Icon icon="bx:bxs-credit-card" width="28" height="28" color='red' />,
     colour: '#ff4560',
 };

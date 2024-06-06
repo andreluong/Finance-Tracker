@@ -7,7 +7,7 @@ import TransactionViewModal from './transaction-view-modal';
 export default function TransactionModal({
     transaction,
     isOpen,
-    onOpenChange,
+    onOpenChange
 }: {
     transaction: Transaction | undefined;
     isOpen: boolean;
