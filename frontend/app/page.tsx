@@ -1,8 +1,9 @@
 'use client';
 
-import { SignInButton, SignUpButton, SignedIn, SignedOut, useUser } from "@clerk/nextjs";
+import { SignedIn, SignedOut, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import Landing from "./components/landing";
 
 export default function Home() {
     const router = useRouter();
@@ -17,17 +18,8 @@ export default function Home() {
     return (
         <>
             <SignedOut>
-                <div>
-                    <h1>Finance Tracker</h1>
-                    <p>
-                        Finance Tracker is a simple web application that helps you track
-                        your expenses and income.
-                    </p>
-                    <SignInButton />
-                    <SignUpButton />
-                </div>
+                <Landing />
             </SignedOut>
-
             <SignedIn>
                 <p>Loading...</p>
             </SignedIn>
