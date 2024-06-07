@@ -6,15 +6,12 @@ require('dotenv').config({ path: ['.env.local', '.env'] })
 const PORT = process.env.SERVER_PORT || 8080;
 
 const corsOptions = cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:3000',
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    origin: [process.env.CLIENT_URL, 'http://localhost:3000'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-HTTP-Method-Override', 'Accept']
 })
 
 app.use(corsOptions);
-app.options('*', cors(corsOptions));
-
 app.use(express.urlencoded({extended: true}))
 app.use(express.json());
 
