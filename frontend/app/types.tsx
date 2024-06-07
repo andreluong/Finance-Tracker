@@ -40,3 +40,8 @@ export type CategoryStat = {
     colour: string;
     type: string;
 }
+
+export type KeyValueProp<T, U> = {
+    label: T;
+    value: U;
+};

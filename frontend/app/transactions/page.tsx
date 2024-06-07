@@ -4,7 +4,7 @@ import { useAuth } from "@clerk/nextjs";
 import { useState } from "react";
 import CategoryStats from "./components/category-stats";
 import TransactionsTable from "./components/transactions-table";
-import { Category, Transaction } from "@/app/types";
+import { Category, KeyValueProp, Transaction } from "@/app/types";
 import useSWR from "swr";
 import { fetcher, fetcherWithToken } from "@/app/lib/utils";
 import { Input, Select, SelectItem } from "@nextui-org/react";
@@ -12,11 +12,6 @@ import Loader from "../components/dashboard/loader";
 import ExportButton from "./components/export-button";
 import ImportButton from "./components/import-button";
 import TransactionURLProvider from "../lib/transction-url-context";
-
-type YearProp = {
-    label: string;
-    value: string;
-};
 
 export default function AllTransactions() {
     const { getToken } = useAuth();
@@ -65,7 +60,7 @@ export default function AllTransactions() {
     };
 
     const getYears = () => {
-        const defaultValues: YearProp[] = [
+        const defaultValues: KeyValueProp<string, string>[] = [
             { label: "All Time", value: "allTime" },
             { label: "Last 7 days", value: "last7Days" },
             { label: "Last 30 days", value: "last30Days" }
@@ -75,7 +70,7 @@ export default function AllTransactions() {
             data: years,
             error: fetchYearsError,
             isLoading: fetchYearsLoading,
-        } = useSWR<YearProp[], Error, any>(
+        } = useSWR<KeyValueProp<string, string>[], Error, any>(
             "http://localhost:8080/api/transactions/years",
             async (url: string) => fetcherWithToken(url, await getToken())
         );
@@ -115,7 +110,7 @@ export default function AllTransactions() {
                         variant="faded"
                         className="w-8/12"
                     >
-                        {(year: YearProp) => (
+                        {(year: KeyValueProp<string, string>) => (
                             <SelectItem key={year.value} value={year.value}>
                                 {year.label}
                             </SelectItem>
