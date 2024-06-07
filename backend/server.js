@@ -7,10 +7,14 @@ const PORT = process.env.SERVER_PORT || 8080;
 
 const corsOptions = cors({
     origin: process.env.CLIENT_URL || 'http://localhost:3000',
-    credentials: true
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 })
 
 app.use(corsOptions);
+app.options('*', cors(corsOptions));
+
 app.use(express.urlencoded({extended: true}))
 app.use(express.json());
 
