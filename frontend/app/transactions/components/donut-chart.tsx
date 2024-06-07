@@ -1,19 +1,50 @@
+import { INCOME, EXPENSES } from "@/app/constants";
+import { CategoryStat } from "@/app/types";
 import React from "react";
 import ReactApexChart from "react-apexcharts";
 
 export default function DonutChart({
-    series,
-    colours,
-    labels,
-    total,
-    totalLabel,
+    type,
+    categoryStats,
+    incomeTotal,
+    expenseTotal
 }: {
-    series: number[];
-    colours: string[];
-    labels: string[];
-    total: string;
-    totalLabel: string;
+    type: string;
+    categoryStats: CategoryStat[];
+    incomeTotal: string;
+    expenseTotal: string;
 }) {
+    const calculateNetTotal = (income: any, expense: any) => Number(income - expense).toFixed(2);
+
+    const determineNetTotalLabel = (type: string, netTotal: string) => {
+        return type === "all"
+            ? "Net Income"
+            : Number(netTotal) >= 0
+                ? "Income Total"
+                : "Expense Total";
+    };
+
+    let series: number[] = [];
+    let colours: string[] = [];
+    let labels: string[] = [];
+    let netTotal = calculateNetTotal(incomeTotal, expenseTotal);
+    let netTotalLabel = determineNetTotalLabel(type, netTotal);
+
+    if (type === "all") {
+        // Show only income and expenses
+        series = [Number(incomeTotal), Number(expenseTotal)];
+        colours = [INCOME.colour, EXPENSES.colour];
+        labels = [INCOME.value, EXPENSES.value];
+    } else {
+        // Show all categories
+        categoryStats.forEach((category: CategoryStat) => {
+            series.push(Number(category.total));
+            colours.push(category.colour);
+            labels.push(category.name);
+        });
+        netTotal = type === "expense" ? expenseTotal : incomeTotal;
+    }
+
     const chartState = {
         series: series,
         options: {
@@ -39,9 +70,9 @@ export default function DonutChart({
                                 fontFamily: "sans-serif",
                                 fontWeight: "bold",
                                 fontSize: "20px",
-                                label: totalLabel,
+                                label: netTotalLabel,
                                 color: "#000000",
-                                formatter: () => `$${total}`,
+                                formatter: () => `$${netTotal}`,
                             },
                         },
                         size: "70%"
