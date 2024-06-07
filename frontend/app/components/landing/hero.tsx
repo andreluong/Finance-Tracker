@@ -1,8 +1,10 @@
 import { Button, Card, CardBody, Image } from '@nextui-org/react'
 import { motion } from 'framer-motion';
 import NextImage from "next/image";
-import DonutChart from './donut-chart';
 import { SignUpButton } from '@clerk/nextjs';
+import dynamic from 'next/dynamic'
+
+const DonutChart = dynamic(() => import('./donut-chart'), { ssr: false });
 
 function FadeInWhenVisible({ children }: { children: React.ReactNode }) {
     return (

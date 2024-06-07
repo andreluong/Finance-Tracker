@@ -49,12 +49,16 @@ export default function DonutChart() {
     }
 
     return (
-        <ReactApexChart
-            options={chartState.options}
-            series={chartState.series}
-            type="donut"
-            height={400}
-            width={400}
-        />
+        <>
+            {(typeof window !== 'undefined') &&
+                <ReactApexChart
+                    options={chartState.options}
+                    series={chartState.series}
+                    type="donut"
+                    height={400}
+                    width={400}
+                />
+            }
+        </>
     )
 }

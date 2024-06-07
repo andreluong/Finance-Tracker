@@ -6,7 +6,7 @@ export const sendImportTransactionsRequest = async (file: File, url: string, tok
     formData.append('file', file);
 
     await axios
-        .post("http://localhost:8080/api/transactions/import", formData, {
+        .post(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/transactions/import`, formData, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "multipart/form-data"

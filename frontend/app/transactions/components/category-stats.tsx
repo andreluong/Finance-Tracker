@@ -1,12 +1,12 @@
 import React from "react";
-import DonutChart from "./donut-chart";
-import { CategoryStat } from "@/app/types";
 import useSWR from "swr";
 import { fetcherWithToken } from "@/app/lib/utils";
 import CategoryStatsTable from "./category-stats-table";
-import { EXPENSES, INCOME } from "@/app/constants";
 import { useAuth } from "@clerk/nextjs";
 import Loader from "@/app/components/dashboard/loader";
+import dynamic from "next/dynamic";
+
+const DonutChart = dynamic(() => import('./donut-chart'), { ssr: false });
 
 export default function CategoryStats({
     type,
@@ -22,7 +22,7 @@ export default function CategoryStats({
         error,
         isLoading,
     } = useSWR(
-        `http://localhost:8080/api/transactions/category/stats?type=${type}&period=${period}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/transactions/category/stats?type=${type}&period=${period}`,
         async (url: string) => fetcherWithToken(url, await getToken())
     );
 

@@ -93,11 +93,15 @@ export default function DonutChart({
     };
 
     return (
-        <ReactApexChart
-            options={chartState.options}
-            series={chartState.series}
-            type="donut"
-            width="450"
-        />
+        <>
+            {(typeof window !== 'undefined') && 
+                <ReactApexChart
+                    options={chartState.options}
+                    series={chartState.series}
+                    type="donut"
+                    width="450"
+                />
+            }
+        </>
     );
 }

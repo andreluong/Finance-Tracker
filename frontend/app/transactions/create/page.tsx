@@ -11,7 +11,7 @@ import TransactionURLProvider from "@/app/lib/transction-url-context";
 
 export default function CreateTransaction() {
     const { getToken } = useAuth();
-    const transctionsURL = `http://localhost:8080/api/transactions/recent`;
+    const transctionsURL = `${process.env.NEXT_PUBLIC_SERVER_URL}/api/transactions/recent`;
 
     const {
         data: recentTransactions,

@@ -28,7 +28,7 @@ export default function TransactionViewModal({
             const token = await getToken();
 
             await axios
-                .delete(`http://localhost:8080/api/transactions/${transaction.id}`,
+                .delete(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/transactions/${transaction.id}`,
                     { headers: { Authorization: `Bearer ${token}` }}
                 )
                 .then((res) => console.log(res.data))

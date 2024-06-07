@@ -70,11 +70,15 @@ export default function MonthlyTransactionsChart({
     }, [data])
 
     return (
-        <ReactApexChart 
-            options={chartState.options}
-            series={chartState.series}
-            type="bar"
-            height={330}
-        />
+        <>
+            {(typeof window !== "undefined") && 
+                <ReactApexChart 
+                    options={chartState.options}
+                    series={chartState.series}
+                    type="bar"
+                    height={330}
+                />
+            }
+        </>
     )
 }

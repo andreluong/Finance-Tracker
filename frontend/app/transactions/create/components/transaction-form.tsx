@@ -29,7 +29,7 @@ export default function TransactionForm() {
         defaultValues: {
             name: "",
             amount: "",
-            date: undefined,
+            date: null,
             type: "",
             category: "",
             description: "",
@@ -46,7 +46,7 @@ export default function TransactionForm() {
 
         await axios
             .post(
-                "http://localhost:8080/api/transactions/create",
+                `${process.env.NEXT_PUBLIC_SERVER_URL}/api/transactions/create`,
                 { ...data },
                 { headers: { Authorization: `Bearer ${token}` } }
             )

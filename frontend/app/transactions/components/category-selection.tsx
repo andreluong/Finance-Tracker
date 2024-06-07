@@ -18,7 +18,7 @@ export default function CategorySelection({
         data: categories,
         error,
         isLoading
-    } = useSWR("http://localhost:8080/api/categories/all", fetcher);
+    } = useSWR(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/categories/all`, fetcher);
 
     const renderCategories = (categories: Category[]) => {
         return categories.map((category) => 

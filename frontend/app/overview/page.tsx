@@ -4,10 +4,10 @@ import { useAuth } from "@clerk/nextjs";
 import React, { useState } from "react";
 import useSWR from "swr";
 import { fetcherWithToken } from "../lib/utils";
-import MonthlyTransactionsChart from "./components/monthly-transactions-chart";
 import { Select, SelectItem } from "@nextui-org/react";
 import Loader from "../components/dashboard/loader";
 import { KeyValueProp } from "../types";
+import dynamic from "next/dynamic";
 
 type TopSpendingCategory = {
     name: string;
@@ -38,6 +38,8 @@ const months = [
     "December"
 ];
 
+const MonthlyTransactionsChart = dynamic(() => import('./components/monthly-transactions-chart'), { ssr: false });
+
 export default function Overview() {
     const { getToken } = useAuth();
     const [month, setMonth] = useState<number>(new Date().getMonth() + 1);
@@ -48,7 +50,7 @@ export default function Overview() {
         error: monthlyTransactionsError,
         isLoading: isMonthlyTransactionsLoading,
     } = useSWR(
-        `http://localhost:8080/api/overview/monthly-transactions?year=${year}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/overview/monthly-transactions?year=${year}`,
         async (url: string) => fetcherWithToken(url, await getToken())
     );
 
@@ -57,7 +59,7 @@ export default function Overview() {
         error: yearsError,
         isLoading: yearsLoading,
     } = useSWR<KeyValueProp<string, string>[], Error, any>(
-        "http://localhost:8080/api/transactions/years",
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/transactions/years`,
         async (url: string) => fetcherWithToken(url, await getToken())
     );
 
@@ -66,7 +68,7 @@ export default function Overview() {
         error: overviewError,
         isLoading: overviewLoading,
     } = useSWR(
-        `http://localhost:8080/api/overview/summary?month=${month}&year=${year}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/overview/summary?month=${month}&year=${year}`,
         async (url: string) => fetcherWithToken(url, await getToken())
     );
     

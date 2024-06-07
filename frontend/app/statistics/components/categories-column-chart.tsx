@@ -43,11 +43,15 @@ export default function CategoriesColumnChart({
     }
 
     return (
-        <ReactApexChart
-            options={chartState.options}
-            series={chartState.series}
-            type="bar"
-            height={400}
-        />
+        <>
+            {(typeof window !== 'undefined') && 
+                <ReactApexChart
+                    options={chartState.options}
+                    series={chartState.series}
+                    type="bar"
+                    height={400}
+                />
+            }
+        </>
     )
 }

@@ -1,11 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import useSWR from "swr";
 import { fetcherWithToken } from "../lib/utils";
 import Loader from "../components/dashboard/loader";
 import { useAuth } from "@clerk/nextjs";
-import CategoriesColumnChart from "./components/categories-column-chart";
+import dynamic from "next/dynamic";
+
+const CategoriesColumnChart = dynamic(() => import('./components/categories-column-chart'), { ssr: false });
 
 export default function Statistics() {
     const { getToken } = useAuth();
@@ -15,7 +17,7 @@ export default function Statistics() {
         error: statisticsError,
         isLoading: statisticsIsLoading,
     } = useSWR(
-        'http://localhost:8080/api/statistics/income-expense-stats',
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/statistics/income-expense-stats`,
         async (url: string) => fetcherWithToken(url, await getToken())
     )
 

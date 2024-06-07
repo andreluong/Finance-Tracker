@@ -9,9 +9,11 @@ import useSWR from "swr";
 import { fetcher, fetcherWithToken } from "@/app/lib/utils";
 import { Input, Select, SelectItem } from "@nextui-org/react";
 import Loader from "../components/dashboard/loader";
-import ExportButton from "./components/export-button";
 import ImportButton from "./components/import-button";
 import TransactionURLProvider from "../lib/transction-url-context";
+import dynamic from "next/dynamic";
+
+const DynamicExportButton = dynamic(() => import("./components/export-button"), { ssr: false });
 
 export default function AllTransactions() {
     const { getToken } = useAuth();
@@ -20,7 +22,7 @@ export default function AllTransactions() {
     const [categoryId, setCategoryId] = useState<number>(-1);
     const [period, setPeriod] = useState<string>("allTime");
     const [search, setSearch] = useState<string>("");
-    const transactionsURL = `http://localhost:8080/api/transactions/all?type=${type}&category=${categoryId}&period=${period}`;
+    const transactionsURL = `${process.env.NEXT_PUBLIC_SERVER_URL}/api/transactions/all?type=${type}&category=${categoryId}&period=${period}`;
 
     const {
         data: transactions,
@@ -40,7 +42,7 @@ export default function AllTransactions() {
             error: fetchCategoriesError,
             isLoading: fetchCategoriesLoading,
         } = useSWR<Category[], Error, any>(
-            `http://localhost:8080/api/categories/unique?type=${type}`,
+            `${process.env.NEXT_PUBLIC_SERVER_URL}/api/categories/unique?type=${type}`,
             fetcher
         );
         
@@ -71,7 +73,7 @@ export default function AllTransactions() {
             error: fetchYearsError,
             isLoading: fetchYearsLoading,
         } = useSWR<KeyValueProp<string, string>[], Error, any>(
-            "http://localhost:8080/api/transactions/years",
+            `${process.env.NEXT_PUBLIC_SERVER_URL}/api/transactions/years`,
             async (url: string) => fetcherWithToken(url, await getToken())
         );
 
@@ -156,7 +158,7 @@ export default function AllTransactions() {
                 </div>
                 <div className="flex flex-row gap-2">
                     <ImportButton url={transactionsURL} />              
-                    <ExportButton transactions={filteredTransactions} />
+                    <DynamicExportButton transactions={filteredTransactions} />
                 </div>
             </div>
             <div className="flex flex-wrap mb-4">

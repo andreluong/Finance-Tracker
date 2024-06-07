@@ -47,7 +47,7 @@ export default function TransactionFormModal({
 
         await axios
             .patch(
-                `http://localhost:8080/api/transactions/update/${transaction.id}`,
+                `${process.env.NEXT_PUBLIC_SERVER_URL}/api/transactions/update/${transaction.id}`,
                 { ...data },
                 { headers: { Authorization: `Bearer ${token}` } }
             )
