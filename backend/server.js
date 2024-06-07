@@ -6,7 +6,7 @@ require('dotenv').config({ path: ['.env.local', '.env'] })
 const PORT = process.env.SERVER_PORT || 8080;
 
 const corsOptions = cors({
-    origin: [process.env.CLIENT_URL, 'http://localhost:3000'],
+    origin: [process.env.CLIENT_URL, 'https://keen-hawk-89.clerk.accounts.dev'],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-HTTP-Method-Override', 'Accept']
 })
