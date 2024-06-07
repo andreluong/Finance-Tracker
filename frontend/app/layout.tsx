@@ -34,7 +34,6 @@ export default function RootLayout({
             <SignedOut>
               {children}
             </SignedOut>
-
             <SignedIn>
               <div className="flex">
                 <Sidenav />

@@ -74,7 +74,7 @@ export default function MonthlyTransactionsChart({
             options={chartState.options}
             series={chartState.series}
             type="bar"
-            height={400}
+            height={330}
         />
     )
 }

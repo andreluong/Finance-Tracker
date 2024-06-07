@@ -21,8 +21,8 @@ export default function Header() {
                     'border-b border-gray-200 bg-white': selectedLayout,
                 },
             )}
-            >
-            <div className="flex h-[50px] items-center justify-between px-4">
+        >
+            <div className="flex h-[50px] items-center justify-between px-6">
                 <div className="flex items-center space-x-4">
                     <Link
                         href="/"
@@ -32,13 +32,10 @@ export default function Header() {
                         <span className="font-bold text-xl flex ">Finance Tracker</span>
                     </Link>
                 </div>
-
                 <div className="hidden md:block">
-                    <div className="h-8 w-8 rounded-full bg-zinc-300 flex items-center justify-center text-center">
-                        <SignedIn>
-                            <UserButton />
-                        </SignedIn>
-                    </div>
+                    <SignedIn>
+                        <UserButton />
+                    </SignedIn>
                 </div>
             </div>
         </div>

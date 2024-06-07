@@ -80,7 +80,7 @@ export default function Overview() {
 
     return (
         <div>
-            <div className="flex flex-nowrap w-full">
+            <div className="flex flex-row w-full">
                 <h1 className="text-4xl font-bold mb-4 w-4/5">
                     Overview of {months[month - 1]} {year}
                 </h1>
@@ -115,7 +115,7 @@ export default function Overview() {
                     </Select>
                 </div>
             </div>
-            <div className="flex flex-nowrap gap-4">
+            <div className="flex flex-row gap-4">
                 <div className="border border-zinc-200 bg-white rounded-lg my-2 p-4 w-1/3">
                     <p className="text-2xl pb-8">Net Income</p>
                     <div className="text-4xl font-bold">
@@ -135,16 +135,16 @@ export default function Overview() {
                     </div>
                 </div>
             </div>
-            <div className="flex flex-nowrap gap-4">
+            <div className="flex flex-row gap-4 w-full">
                 <div className="border border-zinc-200 bg-white rounded-lg my-2 p-4 w-1/2">
                     <p className="text-2xl pb-8">
                         Top Spending Categories
                     </p>
-                    <div className="flex flex-nowrap gap-4">
+                    <div className="flex flex-row gap-4">
                         {overview.topSpendingCategories.map(
                             (category: TopSpendingCategory) => (
                                 <div
-                                    className="rounded-lg p-4 w-52"
+                                    className="rounded-lg p-4 w-1/4"
                                     key={category.name}
                                     style={{ backgroundColor: category.colour }}
                                 >
@@ -167,7 +167,7 @@ export default function Overview() {
                         {overview.frequentSpendingCategories.map(
                             (category: FrequentSpendingCategory) => (
                                 <div
-                                    className="rounded-lg p-4 w-52"
+                                    className="rounded-lg p-4 w-1/3"
                                     key={category.name}
                                     style={{
                                         backgroundColor: category.colour,
