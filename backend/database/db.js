@@ -400,4 +400,21 @@ const overview = {
     }
 }
 
-module.exports = { transaction, category, overview };
+const statistics = {
+    getCountAndSumOfAmounts: async function(user_id, type) {
+        const q = `
+            SELECT
+                COUNT(id) AS count,
+                SUM(amount) AS total
+            FROM
+                transaction
+            WHERE
+                user_id = $1
+                AND type = $2;    
+        `
+        const res = await pool.query(q, [user_id, type]);
+        return res.rows[0];
+    }
+}
+
+module.exports = { transaction, category, overview, statistics };

@@ -18,7 +18,6 @@ const getSummary = async (req, res) => {
     try {
         // Get income and expense totals for the month and year
         const data = await database.overview.getIncomeAndExpenseTotals(req.auth.userId, month, year);
-        console.log("data", data, month, year)
         
         let income = data.find((item) => item.type === 'income')?.total || 0;
         let expense = data.find((item) => item.type === 'expense')?.total || 0;

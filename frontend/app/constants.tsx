@@ -21,8 +21,8 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
         submenu: false
     },
     {
-        title: 'Analytics',
-        path: '/analytics',
+        title: 'Statistics',
+        path: '/statistics',
         icon: <Icon icon="lucide:bar-chart-3" width="24" height="24" />,
         submenu: false
     }

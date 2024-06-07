@@ -21,6 +21,9 @@ app.use(categories);
 const overview = require('./routes/overview.js');
 app.use(overview);
 
+const statistics = require('./routes/statistics.js');
+app.use(statistics);
+
 app.listen(8080, () => {
     console.log('Server is running on port 8080');
 });
