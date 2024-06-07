@@ -4,6 +4,7 @@ import { SignedIn, SignedOut, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Landing from "./components/landing";
+import Loader from "./components/dashboard/loader";
 
 export default function Home() {
     const router = useRouter();
@@ -21,7 +22,7 @@ export default function Home() {
                 <Landing />
             </SignedOut>
             <SignedIn>
-                <p>Loading...</p>
+                <Loader />
             </SignedIn>
         </>
     );

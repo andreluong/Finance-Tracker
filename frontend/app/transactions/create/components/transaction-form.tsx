@@ -140,6 +140,7 @@ export default function TransactionForm() {
                     render={({ field }) => (
                         <Select
                             {...field}
+                            selectedKeys={[field.value]}
                             label="Type"
                             id="type"
                             className="w-1/3 pr-4"
