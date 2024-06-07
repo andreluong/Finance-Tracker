@@ -3,6 +3,8 @@ const app = express();
 const cors = require('cors');
 require('dotenv').config({ path: ['.env.local', '.env'] })
 
+const PORT = process.env.SERVER_PORT || 8080;
+
 const corsOptions = cors({
     origin: process.env.CLIENT_URL || 'http://localhost:3000',
     credentials: true
@@ -24,6 +26,6 @@ app.use(overview);
 const statistics = require('./routes/statistics.js');
 app.use(statistics);
 
-app.listen(8080, () => {
-    console.log('Server is running on port 8080');
+app.listen(PORT, () => {
+    console.log('Server is running successfully on port ' + PORT);
 });
