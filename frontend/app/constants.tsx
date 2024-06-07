@@ -25,18 +25,6 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
         path: '/analytics',
         icon: <Icon icon="lucide:bar-chart-3" width="24" height="24" />,
         submenu: false
-    },
-    {
-        title: 'Categories',
-        path: '/categories',
-        icon: <Icon icon="lucide:tag" width="24" height="24" />,
-        submenu: false
-    },
-    {
-        title: 'Settings',
-        path: '/settings',
-        icon: <Icon icon="lucide:settings" width="24" height="24" />,
-        submenu: false
     }
 ];
 
