@@ -1,6 +1,14 @@
-const database = require('../database/db');
+const database = require("../database/db");
 
-async function createTransaction(name, amount, description, type, category, date, user_id) {
+async function createTransaction(
+    name,
+    amount,
+    description,
+    type,
+    category,
+    date,
+    user_id
+) {
     try {
         await database.transaction.create({
             name,
@@ -9,7 +17,7 @@ async function createTransaction(name, amount, description, type, category, date
             type,
             category,
             date,
-            user_id
+            user_id,
         });
     } catch (error) {
         console.error(error.message);
@@ -18,5 +26,5 @@ async function createTransaction(name, amount, description, type, category, date
 }
 
 module.exports = {
-    createTransaction
+    createTransaction,
 };

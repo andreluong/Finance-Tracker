@@ -1,25 +1,58 @@
-require('dotenv').config({ path: ['.env.local', '.env'] })
-const express = require('express');
+require("dotenv").config({ path: [".env.local", ".env"] });
+const express = require("express");
 const router = express.Router();
-const clerkAuth = require('../middlewares/clerkAuthMiddleware');
-const transactionsController = require('../controllers/transactionsController');
-const multer  = require('multer')
-const upload = multer({ dest: 'uploads/' })
+const clerkAuth = require("../middlewares/clerkAuthMiddleware");
+const transactionsController = require("../controllers/transactionsController");
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
 
-router.post('/api/transactions/create', clerkAuth, transactionsController.createTransaction);
+router.post(
+    "/api/transactions/create",
+    clerkAuth,
+    transactionsController.createTransaction
+);
 
-router.post('/api/transactions/import', clerkAuth, upload.single('file'), transactionsController.importTransactions);
+router.post(
+    "/api/transactions/import",
+    clerkAuth,
+    upload.single("file"),
+    transactionsController.importTransactions
+);
 
-router.get('/api/transactions/recent', clerkAuth, transactionsController.getTenRecentTransactions);
+router.get(
+    "/api/transactions/recent",
+    clerkAuth,
+    transactionsController.getTenRecentTransactions
+);
 
-router.get('/api/transactions/all', clerkAuth, transactionsController.getAllTransactions);
+router.get(
+    "/api/transactions/all",
+    clerkAuth,
+    transactionsController.getAllTransactions
+);
 
-router.patch('/api/transactions/update/:id', clerkAuth, transactionsController.updateTransaction);
+router.patch(
+    "/api/transactions/update/:id",
+    clerkAuth,
+    transactionsController.updateTransaction
+);
 
-router.get('/api/transactions/category/stats', clerkAuth, transactionsController.getCategoryStats);
+router.get(
+    "/api/transactions/category/stats",
+    clerkAuth,
+    transactionsController.getCategoryStats
+);
 
-router.get('/api/transactions/years', clerkAuth, transactionsController.getYears);
+router.get(
+    "/api/transactions/years",
+    clerkAuth,
+    transactionsController.getYears
+);
 
-router.delete('/api/transactions/:id', clerkAuth, transactionsController.deleteTransaction);
+router.delete(
+    "/api/transactions/:id",
+    clerkAuth,
+    transactionsController.deleteTransaction
+);
 
 module.exports = router;

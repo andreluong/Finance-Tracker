@@ -1,34 +1,43 @@
-const { Pool } = require('pg')
-const utils = require('./utils.js');
-require('dotenv').config({ path: ['.env.local', '.env'] })
+const { Pool } = require("pg");
+const utils = require("./utils.js");
+require("dotenv").config({ path: [".env.local", ".env"] });
 
 const pool = new Pool({
     host: process.env.DATABASE_HOST,
     port: process.env.DATABASE_PORT,
     user: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
-    database: process.env.DATABASE_NAME
-})
+    database: process.env.DATABASE_NAME,
+});
 
 // Queries
 
 const transaction = {
-    create: async function(transaction) {
-        const {name, amount, description, type, category, date, user_id} = transaction;
+    create: async function (transaction) {
+        const { name, amount, description, type, category, date, user_id } =
+            transaction;
         const q = `
             INSERT INTO transaction (amount, name, description, type, category_id, date, user_id)
             VALUES ($1, $2, $3, $4, $5, $6, $7)
-        `
-        await pool.query(q, [amount, name, description, type, category, new Date(date), user_id]);
+        `;
+        await pool.query(q, [
+            amount,
+            name,
+            description,
+            type,
+            category,
+            new Date(date),
+            user_id,
+        ]);
     },
-    
-    getById: async function(id, user_id) {
-        const q = `SELECT * FROM transaction WHERE id = $1 AND user_id = $2`
+
+    getById: async function (id, user_id) {
+        const q = `SELECT * FROM transaction WHERE id = $1 AND user_id = $2`;
         const res = await pool.query(q, [id, user_id]);
         return res.rows[0];
     },
 
-    getAll: async function(user_id) {
+    getAll: async function (user_id) {
         const q = `
             SELECT 
                 t.id,
@@ -46,12 +55,18 @@ const transaction = {
             WHERE
                 t.category_id = c.id
                 AND user_id = $1
-        `
+        `;
         const res = await pool.query(q, [user_id]);
         return res.rows;
     },
 
-    getAllDynamically: async function(user_id, type, category, period, search) {
+    getAllDynamically: async function (
+        user_id,
+        type,
+        category,
+        period,
+        search
+    ) {
         let q = `
             SELECT 
                 t.id,
@@ -78,7 +93,7 @@ const transaction = {
         `;
         let params = [user_id];
 
-        if (type && type !== 'all') {
+        if (type && type !== "all") {
             q += ` AND t.type = $${params.length + 1}`;
             params.push(type);
         }
@@ -93,23 +108,23 @@ const transaction = {
         if (yearPeriod) {
             params.push(yearPeriod);
         }
-        
-        q += ` ORDER BY date DESC;`
+
+        q += ` ORDER BY date DESC;`;
 
         const res = await pool.query(q, params);
         return res.rows;
     },
 
-    getSumOfAmountsDynamically: async function(user_id, type, period) {
+    getSumOfAmountsDynamically: async function (user_id, type, period) {
         let q = `
             SELECT SUM(amount)
             FROM transaction
             WHERE user_id = $1
-        `
+        `;
         let params = [user_id];
 
-        if (type && type !== 'all') {
-            q += ` AND type = $${params.length + 1}`
+        if (type && type !== "all") {
+            q += ` AND type = $${params.length + 1}`;
             params.push(type);
         }
 
@@ -123,7 +138,7 @@ const transaction = {
         return res.rows[0].sum;
     },
 
-    getRecent: async function(user_id) {
+    getRecent: async function (user_id) {
         const q = `
             SELECT 
                 t.id,
@@ -151,59 +166,69 @@ const transaction = {
                 created_at desc
             LIMIT 
                 20;
-        `
+        `;
         const res = await pool.query(q, [user_id]);
         return res.rows;
     },
 
-    getYears: async function(user_id) {
+    getYears: async function (user_id) {
         const q = `
             SELECT date_part('year', date) AS year
             FROM transaction
             WHERE user_id = $1
             GROUP BY year
             ORDER BY year DESC;
-        `
+        `;
         const res = await pool.query(q, [user_id]);
         return res.rows;
     },
 
-    update: async function(id, transaction) {
-        const {name, amount, description, type, category, date, user_id} = transaction;
+    update: async function (id, transaction) {
+        const { name, amount, description, type, category, date, user_id } =
+            transaction;
         const q = `
             UPDATE transaction
             SET name = $1, amount = $2, description = $3, type = $4, category_id = $5, date = $6
             WHERE id = $7 AND user_id = $8;
-        `
-        await pool.query(q, [name, amount, description, type, category, new Date(date), id, user_id]);
+        `;
+        await pool.query(q, [
+            name,
+            amount,
+            description,
+            type,
+            category,
+            new Date(date),
+            id,
+            user_id,
+        ]);
     },
 
-    deleteById: async function(id, user_id) {
-        const q = `DELETE FROM transaction WHERE id = $1 AND user_id = $2;`
+    deleteById: async function (id, user_id) {
+        const q = `DELETE FROM transaction WHERE id = $1 AND user_id = $2;`;
         await pool.query(q, [id, user_id]);
-    }
-}
+    },
+};
 
 const category = {
-    getAllDynamically: async function(type) {
+    getAllDynamically: async function (type) {
         let q = `
             SELECT *
             FROM category
         `;
         let params = [];
 
-        if (type && type !== 'all') {
-            q += ` WHERE type = $1`
+        if (type && type !== "all") {
+            q += ` WHERE type = $1`;
             params.push(type);
         }
 
-        q += ` ORDER BY id;`
+        q += ` ORDER BY id;`;
 
         const res = await pool.query(q, params);
         return res.rows;
     },
 
-    getAllUniqueDynamically: async function(type) {
+    getAllUniqueDynamically: async function (type) {
         let q = `
             SELECT
                 DISTINCT ON (value) 
@@ -218,8 +243,8 @@ const category = {
         `;
         let params = [];
 
-        if (type && type !== 'all') {
-            q += ` WHERE type = $1`
+        if (type && type !== "all") {
+            q += ` WHERE type = $1`;
             params.push(type);
         }
 
@@ -232,20 +257,24 @@ const category = {
         const res = await pool.query(q, params);
         return res.rows;
     },
-    
-    getIdByNameOrValue: async function(value) {
-        const q = `SELECT id FROM category WHERE name = $1 OR value = $1;`
+
+    getIdByNameOrValue: async function (value) {
+        const q = `SELECT id FROM category WHERE name = $1 OR value = $1;`;
         const res = await pool.query(q, [value]);
         return res.rows[0].id;
     },
 
-    getNameById: async function(id) {
-        const q = `SELECT name FROM category WHERE id = $1;`
+    getNameById: async function (id) {
+        const q = `SELECT name FROM category WHERE id = $1;`;
         const res = await pool.query(q, [id]);
         return res.rows[0].name;
     },
 
-    getTotalAmountPerCategoryDynamically: async function(user_id, type, period) {
+    getTotalAmountPerCategoryDynamically: async function (
+        user_id,
+        type,
+        period
+    ) {
         let q = `
             SELECT 
                 c.name AS name,
@@ -259,11 +288,11 @@ const category = {
                 category c ON t.category_id = c.id
             WHERE
                 t.user_id = $1
-        `
+        `;
         let params = [user_id];
 
-        if (type && type !== 'all') {
-            q += ` AND t.type = $${params.length + 1}`
+        if (type && type !== "all") {
+            q += ` AND t.type = $${params.length + 1}`;
             params.push(type);
         }
 
@@ -273,22 +302,23 @@ const category = {
             params.push(yearPeriod);
         }
 
-        q += ` GROUP BY 
+        q += ` 
+            GROUP BY 
                 c.name,
                 c.colour,
                 c.type
             ORDER BY 
                 total DESC;
-        `
+        `;
 
         const res = await pool.query(q, params);
         return res.rows;
-    }
-}
+    },
+};
 
 // Overview statistics for user
 const overview = {
-    getMonthlyTransactionData: async function(user_id, year) {
+    getMonthlyTransactionData: async function (user_id, year) {
         const q = `
             SELECT
                 DATE_PART('month', date) AS month,
@@ -302,12 +332,12 @@ const overview = {
             GROUP BY
                 DATE_PART('month', date),
                 type;
-        `
+        `;
         const res = await pool.query(q, [user_id, year]);
         return res.rows;
     },
 
-    getIncomeAndExpenseTotals: async function(user_id, month, year) {
+    getIncomeAndExpenseTotals: async function (user_id, month, year) {
         let q = `
             SELECT
                 SUM(amount) AS total,
@@ -317,21 +347,21 @@ const overview = {
             WHERE
                 user_id = $1
                 AND DATE_PART('year', date) = $2
-        `
+        `;
         let params = [user_id, year];
 
-        if (month !== '0') {
-            q += ` AND DATE_PART('month', date) = $${params.length + 1}`
+        if (month !== "0") {
+            q += ` AND DATE_PART('month', date) = $${params.length + 1}`;
             params.push(month);
         }
 
-        q += ` GROUP BY type;`
+        q += ` GROUP BY type;`;
 
         const res = await pool.query(q, params);
         return res.rows;
     },
 
-    getTopSpendingCategories: async function(user_id, month, year) {
+    getTopSpendingCategories: async function (user_id, month, year) {
         let q = `
             SELECT
                 c.name,
@@ -345,28 +375,29 @@ const overview = {
                 AND t.type = 'expense'
                 AND user_id = $1
                 AND DATE_PART('year', date) = $2
-        `
+        `;
         let params = [user_id, year];
 
-        if (month !== '0') {
-            q += ` AND DATE_PART('month', date) = $${params.length + 1}`
+        if (month !== "0") {
+            q += ` AND DATE_PART('month', date) = $${params.length + 1}`;
             params.push(month);
         }
 
-        q += ` GROUP BY
+        q += ` 
+            GROUP BY
                 c.name,
                 c.icon,
                 c.colour
             ORDER BY
                 total_spent DESC
             LIMIT 4;
-        `
+        `;
 
         const res = await pool.query(q, params);
         return res.rows;
     },
 
-    getFrequentSpendingCategories: async function(user_id, month, year) {
+    getFrequentSpendingCategories: async function (user_id, month, year) {
         let q = `
             SELECT
                 c.name,
@@ -380,30 +411,31 @@ const overview = {
                 AND t.type = 'expense'
                 AND user_id = $1
                 AND DATE_PART('year', date) = $2
-        `
+        `;
         let params = [user_id, year];
 
-        if (month !== '0') {
-            q += ` AND DATE_PART('month', date) = $${params.length + 1}`
+        if (month !== "0") {
+            q += ` AND DATE_PART('month', date) = $${params.length + 1}`;
             params.push(month);
         }
 
-        q += ` GROUP BY
+        q += ` 
+            GROUP BY
                 c.name,
                 c.icon,
                 c.colour
             ORDER BY
                 count DESC
             LIMIT 3;
-        `
+        `;
 
         const res = await pool.query(q, params);
         return res.rows;
-    }
-}
+    },
+};
 
 const statistics = {
-    getCountAndSumOfAmounts: async function(user_id, type) {
+    getCountAndSumOfAmounts: async function (user_id, type) {
         const q = `
             SELECT
                 COUNT(id) AS count,
@@ -413,10 +445,10 @@ const statistics = {
             WHERE
                 user_id = $1
                 AND type = $2;    
-        `
+        `;
         const res = await pool.query(q, [user_id, type]);
         return res.rows[0];
-    }
-}
+    },
+};
 
 module.exports = { transaction, category, overview, statistics };
