@@ -150,7 +150,7 @@ const transaction = {
             ORDER BY 
                 created_at desc
             LIMIT 
-                10;
+                20;
         `
         const res = await pool.query(q, [user_id]);
         return res.rows;
@@ -196,6 +196,8 @@ const category = {
             q += ` WHERE type = $1`
             params.push(type);
         }
+
+        q += ` ORDER BY id;`
 
         const res = await pool.query(q, params);
         return res.rows;
