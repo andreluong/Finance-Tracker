@@ -55,4 +55,11 @@ router.delete(
     transactionsController.deleteTransaction
 );
 
+router.post(
+    "/api/transactions/parse/receipt",
+    clerkAuth,
+    upload.single("image"),
+    transactionsController.parseReceipt
+);
+
 module.exports = router;

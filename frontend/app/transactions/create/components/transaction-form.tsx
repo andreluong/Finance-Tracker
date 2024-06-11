@@ -60,7 +60,7 @@ export default function TransactionForm() {
     return (
         <form
             onSubmit={handleSubmit(onSubmit)}
-            className="w-full flex flex-col flex-grow justify-center border border-zinc-200 rounded-lg bg-white p-4 space-y-4"
+            className="w-full flex flex-col justify-center bg-white p-4 space-y-4"
         >
             <Controller
                 name="name"

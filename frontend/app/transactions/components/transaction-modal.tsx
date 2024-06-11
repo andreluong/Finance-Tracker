@@ -35,6 +35,7 @@ export default function TransactionModal({
 
     return (
         <Modal 
+            size='xl'
             isOpen={isOpen} 
             onOpenChange={onOpenChange}
         >

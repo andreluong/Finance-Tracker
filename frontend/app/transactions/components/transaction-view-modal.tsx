@@ -73,7 +73,8 @@ export default function TransactionViewModal({
                         value={transaction.description}
                         isReadOnly
                         variant="faded"
-                        minRows={5}
+                        minRows={6}
+                        size='md'
                     />
                 </div>
             </ModalBody>
