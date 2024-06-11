@@ -143,12 +143,12 @@ export default function Hero() {
                             description='Apply diverse filters to refine your data view'
                         />
                         <FeatureCard
-                            title='Import'
-                            description='Easily import transactions from CSV files'
+                            title='Receipt Processing'
+                            description='Upload your receipt to automatically create a new transaction'
                         />
                         <FeatureCard
-                            title='Export'
-                            description='Export transaction data in CSV format'
+                            title='Import/Export'
+                            description='Easily import or export your transactions with CSV files'
                         />
                     </div>
                 </FadeInWhenVisible>
