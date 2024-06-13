@@ -34,7 +34,7 @@ export default function ExportButton({
         <Button
             isIconOnly
             variant="faded"
-            className="my-auto h-full"
+            className="my-auto h-full hover:border-zinc-400 hover:bg-white"
             size="lg"
             onClick={handleExport}
         >

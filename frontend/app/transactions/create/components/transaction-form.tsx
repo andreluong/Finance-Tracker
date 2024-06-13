@@ -51,7 +51,7 @@ export default function TransactionForm() {
                 { headers: { Authorization: `Bearer ${token}` } }
             )
             .then((response) => console.log(response.data))
-            .catch((error) => console.error(error));
+            .catch((error) => console.error(error.message));
 
         reset();
         mutate(URL);

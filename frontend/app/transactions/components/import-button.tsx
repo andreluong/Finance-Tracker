@@ -1,4 +1,4 @@
-import { sendImportTransactionsRequest } from '@/app/lib/api';
+import { sendProcessCSVRequest, sendProcessReceiptRequest } from '@/app/lib/api';
 import { useAuth } from '@clerk/nextjs';
 import { Icon } from '@iconify/react/dist/iconify.js';
 import { Button } from '@nextui-org/react';
@@ -11,12 +11,16 @@ export default function ImportButton({ url }: { url: string }) {
         // Create an input element to trigger the file selection dialog
         const input = document.createElement("input");
         input.type = "file";
-        input.accept = ".csv";
+        input.accept = ".csv, .jpeg, .jpg, .png";
         input.onchange = async (e) => {
             const file = (e.target as HTMLInputElement).files?.[0];
             if (file) {
                 const token = await getToken();
-                sendImportTransactionsRequest(file, url, token);
+                if (file.name.endsWith('.csv')) {
+                    sendProcessCSVRequest(file, url, token);
+                } else {
+                    sendProcessReceiptRequest(file, url, token)
+                }
             }
         };
         input.click();
@@ -26,7 +30,7 @@ export default function ImportButton({ url }: { url: string }) {
         <Button
             isIconOnly
             variant="faded"
-            className="my-auto h-full"
+            className="my-auto h-full hover:border-zinc-400 hover:bg-white"
             size="lg"
             onClick={handleImport}
         >

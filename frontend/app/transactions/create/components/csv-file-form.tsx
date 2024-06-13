@@ -1,4 +1,4 @@
-import { sendImportTransactionsRequest } from '@/app/lib/api';
+import { sendProcessCSVRequest } from '@/app/lib/api';
 import { useTransactionURL } from '@/app/lib/transction-url-context';
 import { useAuth } from '@clerk/nextjs';
 import { Button, Code } from '@nextui-org/react'
@@ -22,7 +22,7 @@ export default function CSVForm() {
 
     const onSubmit = async (data: FieldValues) => {
         const token = await getToken();
-        sendImportTransactionsRequest(data.file[0], URL, token);
+        sendProcessCSVRequest(data.file[0], URL, token);
         reset();
     }
 
@@ -38,12 +38,12 @@ export default function CSVForm() {
                     <div>
                         <p>Format:</p>
                         <ul className="list-disc ml-4">
+                            <li>date (mm/dd/yy)</li>
                             <li>name</li>
                             <li>amount</li>
-                            <li>description</li>
                             <li>type</li>
                             <li>category</li>
-                            <li>date (mm/dd/yy)</li>
+                            <li>description</li>
                         </ul>
                     </div>
                     <div>
