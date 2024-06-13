@@ -1,3 +1,4 @@
+import Loader from '@/app/components/dashboard/loader';
 import { useTransactionURL } from '@/app/lib/transction-url-context';
 import { useAuth } from '@clerk/nextjs';
 import { Button } from '@nextui-org/react';
@@ -12,7 +13,7 @@ export default function ReceiptForm() {
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: { errors, isSubmitting },
         reset
     } = useForm({
         defaultValues: {
@@ -50,6 +51,8 @@ export default function ReceiptForm() {
         await parseReceipt(data.file[0]);
         reset();
     }
+
+    if (isSubmitting) return <Loader />;
 
     return (
         <form
