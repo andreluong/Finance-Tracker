@@ -210,6 +210,26 @@ const deleteTransaction = async (req, res) => {
     }
 };
 
+const processReceipt = async (req, res) => {
+    try {
+        if (!req.file)
+            return res.status(400).send({ error: "No file uploaded" });
+
+        const imageFile = fs.readFileSync(req.file.path);
+        const imageBase64 = imageFile.toString('base64');
+
+        await transactionsService.processReceipt(imageBase64, req.auth.userId);
+
+        fs.unlinkSync(req.file.path);
+        res.send({ message: "Receipt parsed successfully and a transaction was created" });
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({
+            error: "Something went wrong with processing receipt",
+        });
+    }
+}
+
 const parseReceipt = async (req, res) => {
     try {
         if (!req.file)
@@ -253,5 +273,6 @@ module.exports = {
     getCategoryStats,
     getYears,
     deleteTransaction,
-    parseReceipt
+    parseReceipt,
+    processReceipt
 };

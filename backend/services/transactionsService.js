@@ -1,5 +1,10 @@
 const database = require("../database/db");
 
+// Gemini API
+const GoogleGenerativeAI = require('@google/generative-ai').GoogleGenerativeAI;
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
+
 async function createTransaction(
     name,
     amount,
@@ -25,6 +30,68 @@ async function createTransaction(
     }
 }
 
+// Extracts information from a receipt image using the Gemini API
+async function extractReceipt(imageBase64) {
+    const categoryList = await database.category.getAllDynamically("expense");
+
+    const promptConfig = [
+        {
+            text: `
+            From this image of a receipt, I need you to extract information regarding:
+            - "category", the category of the overall receipt. It must be one of the categories in the system: 
+                ${categoryList.map((cat) => cat.name).join(", ")}.
+            - "date", the date of the purchase, in the format, "YYYY-MM-DD".
+            - "items", the items purchased. Create this as an object with the name of the item, quantity (include the unit of measure with quantity if found), and amount.
+            - "payment", The payment details. Create this as an object with the payment type, subtotal, tax, tip, and total amount.
+            - "vendor", The vendor details. Create this as an object with the name, address, phone number, email, and website.
+            Return just the extracted information in json format.
+            If no information can be extracted or the image is not a receipt, return an empty object.
+            `,
+        },
+        {
+            inlineData: {
+                mimeType: "image/jpeg",
+                data: imageBase64,
+            },
+        },
+    ];
+
+    const result = await model.generateContent({
+        contents: [{ role: "user", parts: promptConfig }],
+    });
+    const response = result.response;
+
+    // Remove header and footer from response
+    const data = response.text().split("\n").slice(1, -1).join("\n");
+
+    return JSON.parse(data);
+}
+
+// Processes a receipt image by extracting information and creating a transaction
+async function processReceipt(imageBase64, user_id) {
+    console.log("Processing receipt...");
+    
+    try {
+        const receiptData = await extractReceipt(imageBase64);
+        const category = await database.category.getIdByNameOrValue(receiptData.category);
+
+        await createTransactionFromReceipt(
+            receiptData.vendor,
+            receiptData.payment,
+            receiptData.items,
+            category,
+            receiptData.date,
+            user_id
+        );
+
+        console.log("Successfully processed receipt");
+    } catch (error) {
+        console.error(error.message);
+        throw new Error("Error processing receipt");
+    }
+}
+
+// TODO: Remove
 async function parseReceipt(data) {
     console.log("Parsing receipt...");
 
@@ -58,68 +125,70 @@ async function parseReceipt(data) {
     return { vendor, payment, items, purchase_date };
 }
 
+// Creates a transaction from the extracted receipt information
 async function createTransactionFromReceipt(
     vendor,
     payment,
     items,
-    purchase_date,
+    category,
+    date,
     user_id
 ) {
     console.log("Creating transaction from receipt...");
 
-    const vendorDescription = 
-    `
-    Vendor: ${vendor.name || "N/A"}
-    Address: ${vendor.address || "N/A"}
-    Phone: ${vendor.phone || "N/A"}
-    Email: ${vendor.email || "N/A"}
-    Web: ${vendor.web || "N/A"}
-    `
+    const vendorDescription = `
+        Vendor: ${vendor.name || "N/A"}
+        Address: ${vendor.address || "N/A"}
+        Phone: ${vendor.phone_number || "N/A"}
+        Email: ${vendor.email || "N/A"}
+        Web: ${vendor.website || "N/A"}
+    `;
 
     const itemsDescription = items.map((item) => {
         return `
-        Name: ${item.name || "N/A"}
-        Quantity: ${item.quantity || '-'}
-        Amount: ${item.amount || '-'}
+          Name: ${item.name || "N/A"}
+          Quantity: ${item.quantity || "-"}
+          Amount: ${item.amount || "-"}
         `;
     });
 
-    const paymentDescription = 
-    `
-    Payment Type: ${payment.payment_type || "N/A"}
-    Subtotal: ${payment.subtotal || 0}
-    Tax: ${payment.tax || 0}
-    Tip: ${payment.tip || 0}
-    Total: ${payment.total}
+    const paymentDescription = `
+        Payment Type: ${payment.payment_type || "N/A"}
+        Subtotal: ${payment.subtotal || 0}
+        Tax: ${payment.tax || 0}
+        Tip: ${payment.tip || 0}
+        Total: ${payment.total}
     `;
 
+    const newTransaction = {
+        name: vendor.name || "Receipt",
+        amount: payment.total || payment.subtotal,
+        description: `
+            ${vendorDescription}
+
+            items:
+            ${itemsDescription.join('\n')}
+
+            ${paymentDescription}
+        `,
+        type: "expense",
+        category,
+        date,
+        user_id
+    };
+
     try {
-        const newTransaction = {
-            name: vendor.name || "Receipt",
-            amount: payment.total,
-            description: 
-                `
-                ${vendorDescription}
-                items:
-                ${itemsDescription}
-                ${paymentDescription}
-                `,
-            type: "expense",
-            category: 12, // TODO: Map to our categories. Currently is set to Miscellaneous Expense
-            date: purchase_date,
-            user_id,
-        }
         await database.transaction.create(newTransaction);
+        console.log("Transaction created from receipt");
     } catch (error) {
         console.error(error.message);
         throw new Error("Error creating transaction from receipt");
     }
-
-    console.log("Transaction created from receipt");
 }
 
 module.exports = {
     createTransaction,
     parseReceipt,
     createTransactionFromReceipt,
+    processReceipt
 };

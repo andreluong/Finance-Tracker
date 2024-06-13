@@ -28,7 +28,7 @@ export default function ReceiptForm() {
 
         await axios
             .post(
-                `${process.env.NEXT_PUBLIC_SERVER_URL}/api/transactions/parse/receipt`,
+                `${process.env.NEXT_PUBLIC_SERVER_URL}/api/transactions/process/receipt`,
                 formData,
                 {
                     headers: {
