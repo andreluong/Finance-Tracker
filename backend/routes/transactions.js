@@ -3,8 +3,22 @@ const express = require("express");
 const router = express.Router();
 const clerkAuth = require("../middlewares/clerkAuthMiddleware");
 const transactionsController = require("../controllers/transactionsController");
+const path = require('path');
 const multer = require("multer");
-const upload = multer({ dest: "uploads/" });
+const upload = multer({ 
+    dest: "uploads/",
+    limits: { fileSize: 1000000 }, // 1 MB limit
+    fileFilter: (req, file, cb) => {
+        const allowedExtensions = ['.csv', '.jpg', '.jpeg', '.png'];
+        const extname = path.extname(file.originalname); // Get file extension
+
+        if (!allowedExtensions.includes(extname)) {
+            cb(new Error('Invalid file type'));
+        } else {
+            cb(null, true);
+        }
+    }
+});
 
 router.post(
     "/api/transactions/create",
