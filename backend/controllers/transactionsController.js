@@ -2,7 +2,6 @@ const database = require("../database/db");
 const csv = require("csv-parser");
 const fs = require("fs");
 const transactionsService = require("../services/transactionsService");
-const Client = require('@veryfi/veryfi-sdk');
 
 const createTransaction = (req, res) => {
     const { name, amount, description, type, category, date } = req.body;
@@ -230,40 +229,6 @@ const processReceipt = async (req, res) => {
     }
 }
 
-const parseReceipt = async (req, res) => {
-    try {
-        if (!req.file)
-            return res.status(400).send({ error: "No file uploaded" });
-
-        let veryfi_client = new Client(
-            process.env.VERYFI_CLIENT_ID,
-            process.env.VERYFI_CLIENT_SECRET,
-            process.env.VERYFI_USERNAME,
-            process.env.VERYFI_API_KEY
-        );
-        let data = await veryfi_client.process_document(req.file.path);
-        const { vendor, payment, items, purchase_date } = await transactionsService.parseReceipt(data);
-
-        fs.unlinkSync(req.file.path);
-
-        // Create transaction from receipt
-        await transactionsService.createTransactionFromReceipt(
-            vendor,
-            payment,
-            items,
-            purchase_date,
-            req.auth.userId
-        );
-
-        res.send({ message: "Receipt parsed successfully and a transaction was created" });
-    } catch (error) {
-        console.error(error.message);
-        res.status(500).json({
-            error: "Something went wrong with parsing receipt",
-        });
-    }
-};
-
 module.exports = {
     createTransaction,
     importTransactions,
@@ -273,6 +238,5 @@ module.exports = {
     getCategoryStats,
     getYears,
     deleteTransaction,
-    parseReceipt,
     processReceipt
 };

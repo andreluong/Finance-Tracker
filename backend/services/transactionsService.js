@@ -91,40 +91,6 @@ async function processReceipt(imageBase64, user_id) {
     }
 }
 
-// TODO: Remove
-async function parseReceipt(data) {
-    console.log("Parsing receipt...");
-
-    const category = data.category; // TODO: Map to our categories
-    const purchase_date = data.date || data.due_date || data.order_date || data.created_date;
-
-    const items = data.line_items?.map((item) => {
-        return {
-            name: item.description,
-            quantity: item.quantity,
-            amount: item.total,
-        };
-    });
-    const payment = {
-        payment_type: data.payment?.display_name,
-        subtotal: data.subtotal,
-        tax: data.tax,
-        tip: data.tip,
-        total: data.total,
-    };
-    const vendor = {
-        name: data.vendor?.name,
-        address: data.vendor?.address,
-        phone: data.vendor?.phone_number,
-        email: data.vendor?.email,
-        web: data.vendor?.web,
-    };
-
-    console.log("Receipt parsed successfully")
-
-    return { vendor, payment, items, purchase_date };
-}
-
 // Creates a transaction from the extracted receipt information
 async function createTransactionFromReceipt(
     vendor,
@@ -188,7 +154,5 @@ async function createTransactionFromReceipt(
 
 module.exports = {
     createTransaction,
-    parseReceipt,
-    createTransactionFromReceipt,
     processReceipt
 };

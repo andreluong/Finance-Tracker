@@ -56,13 +56,6 @@ router.delete(
 );
 
 router.post(
-    "/api/transactions/parse/receipt",
-    clerkAuth,
-    upload.single("image"),
-    transactionsController.parseReceipt
-);
-
-router.post(
     "/api/transactions/process/receipt",
     clerkAuth,
     upload.single("image"),
