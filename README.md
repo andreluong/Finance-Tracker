@@ -15,7 +15,7 @@ Link: [finance-tracker-weld-gamma.vercel.app](https://finance-tracker-weld-gamma
 - **Security**: Data access is secured and authenticated using Clerk middleware
 - **Transaction Management**: Streamline transaction management tasks with an intuitive UI featuring interactive tables and forms
 - **Flexible Filtering**: Refine your data view with flexible filtering options based on period, type, category, and name
-- **Automated Receipt Processing**: Upload your receipt and key information will be extracted using Veryfi to create a new transaction
+- **Smart Receipt Processing**: Upload your receipt and key information will be extracted using Google Gemini to create a new transaction
 - **Data Import/Export**: Seamlessly import and export your transactions in CSV format
 
 
@@ -61,11 +61,8 @@ Link: [finance-tracker-weld-gamma.vercel.app](https://finance-tracker-weld-gamma
         - Clerk Auth:
             - `CLERK_SECRET_KEY`
             - `CLERK_PUBLISHABLE_KEY`
-        - Veryfi:
-            - `VERYFI_CLIENT_ID`
-            - `VERYFI_CLIENT_SECRET`
-            - `VERYFI_USERNAME`
-            - `VERYFI_API_KEY`
+        - Google Gemini:
+            - `GEMINI_API_KEY`
         - `CLIENT_URL` 
             - (e.g., `http://localhost:3000`)
         - `SERVER_PORT` 
