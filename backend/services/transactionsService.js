@@ -10,7 +10,7 @@ const { Storage } = require('@google-cloud/storage');
 const storage = new Storage({
     projectId: process.env.GOOGLE_PROJECT_ID
 });
-const bucket = storage.bucket("finance-tracker-uploads");
+const bucket = storage.bucket(process.env.GCS_BUCKET_NAME);
 
 async function uploadToBucket(file) {
     const newFilename = Date.now().toString() + file.originalname;
