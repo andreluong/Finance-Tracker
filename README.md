@@ -10,13 +10,12 @@ Link: [finance-tracker-weld-gamma.vercel.app](https://finance-tracker-weld-gamma
 
 ## Features
 
-- **Overview**: Get a comprehensive overview of your finances for a specific time period, including key indicators and summaries
-- **Data Visualization**: Explore your financial data through visually appealing and interactive charts, allowing for deeper insights and analysis
-- **Security**: Data access is secured and authenticated using Clerk middleware
-- **Transaction Management**: Streamline transaction management tasks with an intuitive UI featuring interactive tables and forms
-- **Flexible Filtering**: Refine your data view with flexible filtering options based on period, type, category, and name
-- **Smart Receipt Processing**: Upload your receipt and key information will be extracted using Google Gemini to create a new transaction
+- **Data Visualization**: Interactive charts make it easy to understand your spending trends and identify areas for improvement
+- **Transaction Management**: Add, edit, and delete transactions with a user-friendly interface that streamlines data entry
+- **Flexible Filtering**: Refine your data view by filtering transactions based on specific criteria like date, type, category, or name
+- **Smart Receipt Processing**: Upload a receipt and key information will be extracted to create a new transaction using Google Gemini
 - **Data Import/Export**: Seamlessly import and export your transactions in CSV format
+- **Security**: Data access is secured and authenticated using Clerk middleware
 
 
 ## Technologies
@@ -61,18 +60,18 @@ Link: [finance-tracker-weld-gamma.vercel.app](https://finance-tracker-weld-gamma
         - Clerk Auth:
             - `CLERK_SECRET_KEY`
             - `CLERK_PUBLISHABLE_KEY`
+        - Google Cloud Storage
+            - `GOOGLE_PROJECT_ID`
+            - `GOOGLE_APPLICATION_CREDENTIALS` (path to service account JSON key)
         - Google Gemini:
             - `GEMINI_API_KEY`
-        - `CLIENT_URL` 
-            - (e.g., `http://localhost:3000`)
-        - `SERVER_PORT` 
-            - (e.g., `8080`)
+        - `CLIENT_URL` (e.g., `http://localhost:3000`)
+        - `SERVER_PORT` (e.g., `8080`)
     - Frontend:
         - Clerk Auth:
             - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
             - `CLERK_SECRET_KEY`
-        - `NEXT_PUBLIC_SERVER_URL` 
-            - (e.g., `http://localhost:8080`)
+        - `NEXT_PUBLIC_SERVER_URL` (e.g., `http://localhost:8080`)
 4. Start development servers
     - Frontend: 
         ```
@@ -82,3 +81,11 @@ Link: [finance-tracker-weld-gamma.vercel.app](https://finance-tracker-weld-gamma
         ```
         node server.js
         ```
+
+## Data Privacy
+
+This project uses Clerk for user authentication. Clerks stores your email address and name on their servers. We only access this information to identify you within the application and ensure secure access.
+
+**We do not store any of your uploaded receipts or CSV files**. After processing them to create a transaction, they are immediately and permanently deleted from our Google Cloud Storage.
+
+For more details on Clerk's data practices, please refer to their privacy policy: [Clerk Privacy Policy](https://clerk.com/legal/privacy)
