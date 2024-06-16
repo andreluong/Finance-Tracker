@@ -1,11 +1,11 @@
-import { sendProcessCSVRequest } from '@/app/lib/api';
+import { sendProcessCsvRequest } from '@/app/lib/api';
 import { useTransactionURL } from '@/app/lib/transction-url-context';
 import { useAuth } from '@clerk/nextjs';
 import { Button, Code } from '@nextui-org/react'
 import React from 'react'
 import { FieldValues, useForm } from 'react-hook-form';
 
-export default function CSVForm() {
+export default function CsvForm() {
     const { getToken } = useAuth();
     const { URL } = useTransactionURL();
 
@@ -22,7 +22,7 @@ export default function CSVForm() {
 
     const onSubmit = async (data: FieldValues) => {
         const token = await getToken();
-        sendProcessCSVRequest(data.file[0], URL, token);
+        sendProcessCsvRequest(data.file[0], URL, token);
         reset();
     }
 

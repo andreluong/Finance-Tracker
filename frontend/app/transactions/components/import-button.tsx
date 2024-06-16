@@ -1,4 +1,4 @@
-import { sendProcessCSVRequest, sendProcessReceiptRequest } from '@/app/lib/api';
+import { sendProcessCsvRequest, sendProcessReceiptRequest } from '@/app/lib/api';
 import { useAuth } from '@clerk/nextjs';
 import { Icon } from '@iconify/react/dist/iconify.js';
 import { Button } from '@nextui-org/react';
@@ -17,7 +17,7 @@ export default function ImportButton({ url }: { url: string }) {
             if (file) {
                 const token = await getToken();
                 if (file.name.endsWith('.csv')) {
-                    sendProcessCSVRequest(file, url, token);
+                    sendProcessCsvRequest(file, url, token);
                 } else {
                     sendProcessReceiptRequest(file, url, token)
                 }

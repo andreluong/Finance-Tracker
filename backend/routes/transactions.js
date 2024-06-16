@@ -28,10 +28,10 @@ router.post(
 );
 
 router.post(
-    "/api/transactions/import",
+    "/api/transactions/process/csv",
     clerkAuth,
     upload.single("file"),
-    transactionsController.importTransactions
+    transactionsController.processCsv
 );
 
 router.get(

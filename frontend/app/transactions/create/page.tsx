@@ -6,7 +6,7 @@ import TransactionsTable from "../components/transactions-table";
 import { fetcherWithToken } from "@/app/lib/utils";
 import TransactionForm from "./components/transaction-form";
 import Loader from "@/app/components/dashboard/loader";
-import CSVForm from "./components/csv-file-form";
+import CsvForm from "./components/csv-file-form";
 import TransactionURLProvider from "@/app/lib/transction-url-context";
 import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
 import ReceiptForm from "./components/receipt-form";
@@ -41,7 +41,7 @@ export default function CreateTransaction() {
         {
             id: "csv",
             label: "CSV",
-            content: <CSVForm />
+            content: <CsvForm />
         }
     ];
 

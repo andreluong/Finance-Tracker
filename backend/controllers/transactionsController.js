@@ -24,7 +24,7 @@ const createTransaction = (req, res) => {
     }
 };
 
-const importTransactions = async (req, res) => {
+const processCsv = async (req, res) => {
     try {
         if (!req.file)
             return res.status(400).send({ error: "No file uploaded" });
@@ -228,7 +228,7 @@ const processReceipt = async (req, res) => {
 
 module.exports = {
     createTransaction,
-    importTransactions,
+    processCsv,
     getTenRecentTransactions,
     getAllTransactions,
     updateTransaction,

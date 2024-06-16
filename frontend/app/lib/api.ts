@@ -27,8 +27,8 @@ const sendTransactionsRequest = async (
     mutate(url);
 };
 
-export const sendProcessCSVRequest = async (file: File, url: string, token: string | null) => {
-    await sendTransactionsRequest('file', '/api/transactions/import', file, url, token);
+export const sendProcessCsvRequest = async (file: File, url: string, token: string | null) => {
+    await sendTransactionsRequest('file', '/api/transactions/process/csv', file, url, token);
 };
 
 export const sendProcessReceiptRequest = async (file: File, url: string, token: string | null) => {
