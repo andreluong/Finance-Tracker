@@ -29,7 +29,7 @@ const processCsv = async (req, res) => {
         if (!req.file)
             return res.status(400).send({ error: "No file uploaded" });
 
-        await transactionsService.uploadToBucket(req.file);
+        const fileName = await transactionsService.uploadToBucket(req.file);
 
         const csvData = req.file.buffer.toString("utf8");
         const parsedData = await fastCsv.parseString(csvData, { headers: true });
