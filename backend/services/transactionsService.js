@@ -8,7 +8,6 @@ const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
 // Google Cloud Storage
 const { Storage } = require('@google-cloud/storage');
 const storage = new Storage({
-    keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
     projectId: process.env.GOOGLE_PROJECT_ID
 });
 const bucket = storage.bucket("finance-tracker-uploads");
