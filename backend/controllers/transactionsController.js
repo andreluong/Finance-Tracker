@@ -1,7 +1,6 @@
 const database = require("../database/db");
-const csv = require("csv-parser");
-const fs = require("fs");
 const transactionsService = require("../services/transactionsService");
+const fastCsv = require("@fast-csv/parse")
 
 const createTransaction = (req, res) => {
     const { name, amount, description, type, category, date } = req.body;
@@ -30,33 +29,30 @@ const importTransactions = async (req, res) => {
         if (!req.file)
             return res.status(400).send({ error: "No file uploaded" });
 
-        // Parse CSV file
-        const fileData = [];
-        fs.createReadStream(req.file.path)
-            .pipe(csv())
-            .on("data", (data) => fileData.push(data))
-            .on("end", () => {
-                // Create transactions from file data
-                fileData.map(async (transaction) => {
-                    const { Date, Name, Amount, Type, Category, Description } =
-                        transaction;
-                    const categoryId =
-                        await database.category.getIdByNameOrValue(Category);
-                    transactionsService.createTransaction(
-                        Name,
-                        Amount,
-                        Description,
-                        Type,
-                        categoryId,
-                        Date,
-                        req.auth.userId
-                    );
-                });
-                fs.unlinkSync(req.file.path);
-                res.status(201).json({
-                    message: "Transaction import completed",
-                });
-            });
+        await transactionsService.uploadToBucket(req.file);
+
+        const csvData = req.file.buffer.toString("utf8");
+        const parsedData = await fastCsv.parseString(csvData, { headers: true });
+
+        parsedData.forEach(async (transaction) => {
+            const { Date, Name, Amount, Type, Category, Description } = transaction;
+            const categoryId = await database.category.getIdByNameOrValue(Category);
+            await transactionsService.createTransaction(
+                Name,
+                Amount,
+                Description,
+                Type,
+                categoryId,
+                Date,
+                req.auth.userId
+            );
+        });
+
+        await transactionsService.deleteFromBucket(fileName);
+
+        res.status(201).json({
+            message: "Transaction import completed",
+        });
     } catch (error) {
         console.error(error.message);
         res.status(500).json({
@@ -214,13 +210,14 @@ const processReceipt = async (req, res) => {
         if (!req.file)
             return res.status(400).send({ error: "No file uploaded" });
 
-        const imageFile = fs.readFileSync(req.file.path);
-        const imageBase64 = imageFile.toString('base64');
+        const fileName = await transactionsService.uploadToBucket(req.file);
 
+        const imageBase64 = req.file.buffer.toString('base64');
         await transactionsService.processReceipt(imageBase64, req.auth.userId);
 
-        fs.unlinkSync(req.file.path);
-        res.send({ message: "Receipt parsed successfully and a transaction was created" });
+        await transactionsService.deleteFromBucket(fileName);
+
+        res.status(201).send({ message: "Receipt parsed successfully and a transaction was created" });
     } catch (error) {
         console.error(error.message);
         res.status(500).json({

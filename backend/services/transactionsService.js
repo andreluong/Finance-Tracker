@@ -5,6 +5,42 @@ const GoogleGenerativeAI = require('@google/generative-ai').GoogleGenerativeAI;
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
 
+// Google Cloud Storage
+const { Storage } = require('@google-cloud/storage');
+const storage = new Storage({
+    keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+    projectId: process.env.GOOGLE_PROJECT_ID
+});
+const bucket = storage.bucket("finance-tracker-uploads");
+
+async function uploadToBucket(file) {
+    const newFilename = Date.now().toString() + file.originalname;
+
+    try {
+        await bucket
+            .file(newFilename)
+            .save(file.buffer, { contentType: file.mimetype });
+
+        console.log(`File uploaded to GCS: ${file.originalname}`);
+
+        return newFilename;
+    } catch (error) {
+        console.error(error.message);
+        throw new Error("Error uploading file to bucket");
+    }
+}
+
+// Delete from bucket
+async function deleteFromBucket(filename) {
+    try {
+        await bucket.file(filename).delete();
+        console.log(`File deleted from GCS: ${filename}`);
+    } catch (error) {
+        console.error(error.message);
+        throw new Error("Error deleting file from bucket")
+    }
+}
+
 async function createTransaction(
     name,
     amount,
@@ -153,6 +189,8 @@ async function createTransactionFromReceipt(
 }
 
 module.exports = {
+    uploadToBucket,
+    deleteFromBucket,
     createTransaction,
     processReceipt
 };
