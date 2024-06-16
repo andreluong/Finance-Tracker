@@ -105,7 +105,6 @@ Link: [finance-tracker-weld-gamma.vercel.app](https://finance-tracker-weld-gamma
             projectId: process.env.GOOGLE_PROJECT_ID
         });
         const bucket = storage.bucket(process.env.GCS_BUCKET_NAME);
-
         ```
 
 5. Start development servers
