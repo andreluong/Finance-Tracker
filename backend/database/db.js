@@ -62,8 +62,6 @@ const transaction = {
 
     getAllDynamically: async function (
         user_id,
-        type,
-        category,
         period
     ) {
         let q = `
@@ -91,16 +89,6 @@ const transaction = {
                 AND user_id = $1
         `;
         let params = [user_id];
-
-        if (type && type !== "all") {
-            q += ` AND t.type = $${params.length + 1}`;
-            params.push(type);
-        }
-
-        if (category && category >= 0) {
-            q += ` AND c.id = $${params.length + 1}`;
-            params.push(category);
-        }
 
         let { yearQuery, yearPeriod } = utils.getDateForQuery(period, params);
         q += yearQuery;

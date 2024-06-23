@@ -22,7 +22,7 @@ export default function AllTransactions() {
     const [categoryId, setCategoryId] = useState<number>(-1);
     const [period, setPeriod] = useState<string>("allTime");
     const [search, setSearch] = useState<string>("");
-    const transactionsURL = `${process.env.NEXT_PUBLIC_SERVER_URL}/api/transactions/all?type=${type}&category=${categoryId}&period=${period}`;
+    const transactionsURL = `${process.env.NEXT_PUBLIC_SERVER_URL}/api/transactions/all?period=${period}`;
 
     const {
         data: transactions,
@@ -94,9 +94,11 @@ export default function AllTransactions() {
         return <Loader />
     }
 
-    // Filter transactions based on search query
+    // Filter transactions
     const filteredTransactions = transactions.filter((transaction: Transaction) => 
         transaction.name.toLowerCase().includes(search.toLowerCase())
+        && (type === "all" || transaction.type === type)
+        && (categoryId === -1 || transaction.category.id === Number(categoryId))
     );
 
     return (

@@ -88,15 +88,9 @@ const getRecentTransactions = async (req, res) => {
 
 const getAllTransactions = async (req, res) => {
     try {
-        const type = req.query.type;
-        const category = req.query.category;
-        const period = req.query.period;
-
         const transactions = await database.transaction.getAllDynamically(
             req.auth.userId,
-            type,
-            category,
-            period
+            req.query.period
         );
         res.status(200).json(transactions);
     } catch (error) {
