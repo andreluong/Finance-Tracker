@@ -64,8 +64,7 @@ const transaction = {
         user_id,
         type,
         category,
-        period,
-        search
+        period
     ) {
         let q = `
             SELECT 
@@ -184,8 +183,7 @@ const transaction = {
     },
 
     update: async function (id, transaction) {
-        const { name, amount, description, type, category, date, user_id } =
-            transaction;
+        const { name, amount, description, type, category, date, user_id } = transaction;
         const q = `
             UPDATE transaction
             SET name = $1, amount = $2, description = $3, type = $4, category_id = $5, date = $6

@@ -37,7 +37,7 @@ router.post(
 router.get(
     "/api/transactions/recent",
     clerkAuth,
-    transactionsController.getTenRecentTransactions
+    transactionsController.getRecentTransactions
 );
 
 router.get(

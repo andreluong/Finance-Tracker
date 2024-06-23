@@ -1,6 +1,7 @@
 const database = require("../database/db");
 const transactionsService = require("../services/transactionsService");
-const fastCsv = require("@fast-csv/parse")
+const fastCsv = require("@fast-csv/parse");
+const { isEmpty } = require("../services/utils");
 
 const createTransaction = (req, res) => {
     const { name, amount, description, type, category, date } = req.body;
@@ -25,17 +26,28 @@ const createTransaction = (req, res) => {
 };
 
 const processCsv = async (req, res) => {
+    if (!req.file)
+        return res.status(400).send({ error: "No file uploaded" });
+
+    const fileName = await transactionsService.uploadToBucket(req.file);
+
     try {
-        if (!req.file)
-            return res.status(400).send({ error: "No file uploaded" });
-
-        const fileName = await transactionsService.uploadToBucket(req.file);
-
         const csvData = req.file.buffer.toString("utf8");
-        const parsedData = await fastCsv.parseString(csvData, { headers: true });
+        
+        // Check headers are formatted correctly
+        const expectedHeaders = ["Date", "Name", "Amount", "Type", "Category", "Description"];
+        if (!expectedHeaders.every((header) => csvData.includes(header))) {
+            throw new Error("Invalid CSV file");
+        }
+        
+        const parsedData = fastCsv.parseString(csvData, { headers: true });
+        await parsedData.forEach(async (transactionRow) => {
+            const { Date, Name, Amount, Type, Category, Description } = transactionRow;
 
-        parsedData.forEach(async (transaction) => {
-            const { Date, Name, Amount, Type, Category, Description } = transaction;
+            if (isEmpty(Date) || isEmpty(Name) || isEmpty(Amount) || isEmpty(Type) || isEmpty(Category)) {
+                throw new Error("Invalid data from CSV file");
+            }
+
             const categoryId = await database.category.getIdByNameOrValue(Category);
             await transactionsService.createTransaction(
                 Name,
@@ -50,10 +62,9 @@ const processCsv = async (req, res) => {
 
         await transactionsService.deleteFromBucket(fileName);
 
-        res.status(201).json({
-            message: "Transaction import completed",
-        });
+        res.status(201).json({ message: "Transaction import completed" });
     } catch (error) {
+        await transactionsService.deleteFromBucket(fileName);
         console.error(error.message);
         res.status(500).json({
             error: "Something went wrong with transaction import",
@@ -61,7 +72,7 @@ const processCsv = async (req, res) => {
     }
 };
 
-const getTenRecentTransactions = async (req, res) => {
+const getRecentTransactions = async (req, res) => {
     try {
         const transactions = await database.transaction.getRecent(
             req.auth.userId
@@ -206,19 +217,20 @@ const deleteTransaction = async (req, res) => {
 };
 
 const processReceipt = async (req, res) => {
+    if (!req.file)
+        return res.status(400).send({ error: "No file uploaded" });
+
+    const fileName = await transactionsService.uploadToBucket(req.file);
+
     try {
-        if (!req.file)
-            return res.status(400).send({ error: "No file uploaded" });
-
-        const fileName = await transactionsService.uploadToBucket(req.file);
-
         const imageBase64 = req.file.buffer.toString('base64');
         await transactionsService.processReceipt(imageBase64, req.auth.userId);
 
         await transactionsService.deleteFromBucket(fileName);
 
-        res.status(201).send({ message: "Receipt parsed successfully and a transaction was created" });
+        res.status(201).json({ message: "Receipt parsed successfully and a transaction was created" });
     } catch (error) {
+        await transactionsService.deleteFromBucket(fileName);
         console.error(error.message);
         res.status(500).json({
             error: "Something went wrong with processing receipt",
@@ -229,7 +241,7 @@ const processReceipt = async (req, res) => {
 module.exports = {
     createTransaction,
     processCsv,
-    getTenRecentTransactions,
+    getRecentTransactions,
     getAllTransactions,
     updateTransaction,
     getCategoryStats,

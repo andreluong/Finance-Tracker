@@ -22,6 +22,8 @@ const getSummary = async (req, res) => {
     const { month, year } = req.query;
 
     try {
+        if (!month || !year) throw new Error("Month and year are required");
+
         // Get income and expense totals for the month and year
         const data = await database.overview.getIncomeAndExpenseTotals(
             req.auth.userId,
