@@ -2,12 +2,13 @@ const database = require("../database/db");
 const transactionsService = require("../services/transactionsService");
 const fastCsv = require("@fast-csv/parse");
 const { isEmpty } = require("../services/utils");
+const { requestToKey, readCache, writeCache, deleteCache, handleRequest } = require("../database/redis");
 
-const createTransaction = (req, res) => {
+const createTransaction = async (req, res) => {
     const { name, amount, description, type, category, date } = req.body;
 
     try {
-        transactionsService.createTransaction(
+        await transactionsService.createTransaction(
             name,
             amount,
             description,
@@ -16,6 +17,8 @@ const createTransaction = (req, res) => {
             date,
             req.auth.userId
         );
+        deleteCache(req.auth.userId, "transactions", "overview", "statistics");
+
         res.status(201).json({ message: "Transaction created" });
     } catch (error) {
         console.error(error.message);
@@ -61,6 +64,7 @@ const processCsv = async (req, res) => {
         });
 
         await transactionsService.deleteFromBucket(fileName);
+        deleteCache(req.auth.userId, "transactions", "overview", "statistics");
 
         res.status(201).json({ message: "Transaction import completed" });
     } catch (error) {
@@ -74,10 +78,7 @@ const processCsv = async (req, res) => {
 
 const getRecentTransactions = async (req, res) => {
     try {
-        const transactions = await database.transaction.getRecent(
-            req.auth.userId
-        );
-        res.status(200).json(transactions);
+        handleRequest(req, res, database.transaction.getRecent(req.auth.userId));
     } catch (error) {
         console.error(error.message);
         res.status(500).json({
@@ -88,11 +89,7 @@ const getRecentTransactions = async (req, res) => {
 
 const getAllTransactions = async (req, res) => {
     try {
-        const transactions = await database.transaction.getAllDynamically(
-            req.auth.userId,
-            req.query.period
-        );
-        res.status(200).json(transactions);
+        handleRequest(req, res, database.transaction.getAllDynamically(req.auth.userId, req.query.period));
     } catch (error) {
         console.error(error.message);
         res.status(500).json({
@@ -116,6 +113,8 @@ const updateTransaction = async (req, res) => {
             date,
             user_id: userId,
         });
+        deleteCache(userId, "transactions");
+        
         res.status(200).json({ message: "Transaction updated" });
     } catch (error) {
         console.error(error.message);
@@ -134,45 +133,51 @@ const getCategoryStats = async (req, res) => {
     let expenseTotal = 0;
 
     try {
-        // Get total income and expense amounts for the user
-        if (type === "all" || type === "income") {
-            incomeTotal = await database.transaction.getSumOfAmountsDynamically(
-                userId,
-                "income",
-                period
-            );
-        }
-        if (type === "all" || type === "expense") {
-            expenseTotal =
-                await database.transaction.getSumOfAmountsDynamically(
+        const key = requestToKey(req);
+        const cachedData = await readCache(key);
+        
+        if (cachedData) {
+            res.status(200).json(JSON.parse(cachedData));
+        } else {
+            // Get total income and expense amounts for the user
+            if (type === "all" || type === "income") {
+                incomeTotal = await database.transaction.getSumOfAmountsDynamically(
                     userId,
-                    "expense",
+                    "income",
                     period
                 );
+            }
+            if (type === "all" || type === "expense") {
+                expenseTotal =
+                    await database.transaction.getSumOfAmountsDynamically(
+                        userId,
+                        "expense",
+                        period
+                    );
+            }
+
+            const categoryStats =
+                await database.category.getTotalAmountPerCategoryDynamically(
+                    userId,
+                    type,
+                    period
+                );
+            const total = Number(incomeTotal) + Number(expenseTotal);
+
+            // Calculate percentage of transaction amounts for each category
+            const stats = categoryStats.map((category) => {
+                let percentage = (category.total / total) * 100;
+                percentage = percentage.toFixed(2);
+                return {
+                    ...category,
+                    percentage,
+                };
+            });
+
+            const data = { categoryStats: stats, incomeTotal, expenseTotal };
+            writeCache(key, data);
+            res.status(200).json(data);
         }
-
-        const categoryStats =
-            await database.category.getTotalAmountPerCategoryDynamically(
-                userId,
-                type,
-                period
-            );
-        const total = Number(incomeTotal) + Number(expenseTotal);
-
-        // Calculate percentage of transaction amounts for each category
-        const stats = categoryStats.map((category) => {
-            let percentage = (category.total / total) * 100;
-            percentage = percentage.toFixed(2);
-            return {
-                ...category,
-                percentage,
-            };
-        });
-        res.status(200).json({
-            categoryStats: stats,
-            incomeTotal,
-            expenseTotal,
-        });
     } catch (error) {
         console.error(error.message);
         res.status(500).json({
@@ -183,12 +188,20 @@ const getCategoryStats = async (req, res) => {
 
 const getYears = async (req, res) => {
     try {
-        const yearsData = await database.transaction.getYears(req.auth.userId);
-        const years = yearsData.map((y) => ({
-            label: y.year.toString(),
-            value: y.year.toString(),
-        }));
-        res.status(200).json(years);
+        const key = requestToKey(req);
+        const cachedData = await readCache(key);
+        
+        if (cachedData) {
+            res.status(200).json(JSON.parse(cachedData));
+        } else {
+            const yearsData = await database.transaction.getYears(req.auth.userId);
+            const years = yearsData.map((y) => ({
+                label: y.year.toString(),
+                value: y.year.toString(),
+            }));
+            writeCache(key, years);
+            res.status(200).json(years);
+        }
     } catch (error) {
         console.error(error.message);
         res.status(500).json({
@@ -201,6 +214,8 @@ const deleteTransaction = async (req, res) => {
     try {
         const id = req.params.id;
         await database.transaction.deleteById(id, req.auth.userId);
+        deleteCache(req.auth.userId, "transactions", "overview", "statistics");
+
         res.status(200).json({ message: "Transaction deleted" });
     } catch (error) {
         console.error(error.message);
@@ -219,8 +234,8 @@ const processReceipt = async (req, res) => {
     try {
         const imageBase64 = req.file.buffer.toString('base64');
         await transactionsService.processReceipt(imageBase64, req.auth.userId);
-
         await transactionsService.deleteFromBucket(fileName);
+        deleteCache(req.auth.userId, "transactions", "overview", "statistics");
 
         res.status(201).json({ message: "Receipt parsed successfully and a transaction was created" });
     } catch (error) {

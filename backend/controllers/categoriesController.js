@@ -1,10 +1,20 @@
 const database = require("../database/db");
+const { requestToKey, readCache, writeCache, handleRequest } = require("../database/redis");
 
 const getAllCategories = async (req, res) => {
     try {
-        const income = await database.category.getAllDynamically("income");
-        const expense = await database.category.getAllDynamically("expense");
-        res.status(200).json({ income, expense });
+        const key = requestToKey(req);
+        const cachedData = await readCache(key);
+        if (cachedData) {
+            res.status(200).json(JSON.parse(cachedData));
+        } else {
+            const income = await database.category.getAllDynamically("income");
+            const expense = await database.category.getAllDynamically("expense");
+            const categories = { income, expense };
+            writeCache(key, categories);
+
+            res.status(200).json(data);
+        }
     } catch (error) {
         console.error(error.message);
         res.status(500).json({
@@ -17,10 +27,7 @@ const getAllUniqueCategories = async (req, res) => {
     const type = req.query.type;
 
     try {
-        const categories = await database.category.getAllUniqueDynamically(
-            type
-        );
-        res.status(200).json(categories);
+        handleRequest(req, res, database.category.getAllUniqueDynamically(type));
     } catch (error) {
         console.error(error.message);
         res.status(500).json({

@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const { initializeRedisClient } = require("./database/redis");
 require("dotenv").config({ path: [".env.local", ".env", ".env.test"] });
 
 const corsOptions = cors({
@@ -18,6 +19,8 @@ const corsOptions = cors({
 app.use(corsOptions);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+initializeRedisClient();
 
 const transactions = require("./routes/transactions.js");
 app.use(transactions);
