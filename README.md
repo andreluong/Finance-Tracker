@@ -36,7 +36,8 @@ Link: [finance-tracker-weld-gamma.vercel.app](https://finance-tracker-weld-gamma
 **Deployment**
 - [Vercel](https://vercel.com/home) - Client
 - [Google Cloud Run & Cloud Build](https://cloud.google.com/?hl=en) - Server
-- [Supabase](https://supabase.com/) - Database
+- [Supabase](https://supabase.com/) - Postgres Database
+- [Redis Cloud](https://redis.io/) - Caching
 
 
 ## Setup
@@ -65,6 +66,9 @@ Link: [finance-tracker-weld-gamma.vercel.app](https://finance-tracker-weld-gamma
     | CLERK_SECRET_KEY | &#9745; | Your Clerk secret key (obtain from your Clerk dashboard) |
     | GEMINI_API_KEY | &#9745; | Your Google Gemini API key (required for receipt processing) |
     | CLERK_PUBLISHABLE_KEY | &#9745; | Your Clerk publishable key (obtain from your Clerk dashboard) |
+    | REDIS_PASSWORD | &#9745; | The password of your Redis instance |
+    | REDIS_HOST | &#9745; | The host of your Redis instance |
+    | REDIS_PORT | &#9745; | The port number of your Redis instance |
     | CLIENT_URL | &#9745; | The base URL of your frontend application (e.g., `http://localhost:3000`) |
     | SERVER_PORT | &#9745; | The port number on which your backend server will listen (e.g., `8080`) |
     | GOOGLE_PROJECT_ID | | Your Google Cloud project ID |
