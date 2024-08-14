@@ -2,8 +2,6 @@ export type SideNavItem = {
     title: string;
     path: string;
     icon?: JSX.Element;
-    submenu?: boolean;
-    subMenuItems?: SideNavItem[];
 };
 
 export type MenuItemWithSubMenuProps = {
@@ -37,6 +35,7 @@ export type CategoryStat = {
     count: string;
     total: string;
     percentage?: string;
+    icon?: string;
     colour: string;
     type: string;
 }
@@ -45,3 +44,10 @@ export type KeyValueProp<T, U> = {
     label: T;
     value: U;
 };
+
+export type MonthlyTransactionsProp = {
+    month: number;
+    year: number;
+    total_amount: number;
+    type: string;
+}

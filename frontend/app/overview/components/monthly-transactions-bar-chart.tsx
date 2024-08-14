@@ -8,7 +8,7 @@ type MonthlyTransactionsChartProps = {
     type: string;
 }
 
-export default function MonthlyTransactionsChart({
+export default function MonthlyTransactionsBarChart({
     data
 }: {
     data: MonthlyTransactionsChartProps[];

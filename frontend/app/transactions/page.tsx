@@ -113,6 +113,9 @@ export default function AllTransactions() {
                         label="Period"
                         variant="faded"
                         className="w-8/12"
+                        style={{
+                            backgroundColor: "white"
+                        }}
                     >
                         {(year: KeyValueProp<string, string>) => (
                             <SelectItem key={year.value} value={year.value}>
@@ -130,6 +133,9 @@ export default function AllTransactions() {
                         label="Type"
                         variant="faded"
                         className="w-8/12"
+                        style={{
+                            backgroundColor: "white"
+                        }}
                     >
                         <SelectItem key="all" value="all">All</SelectItem>
                         <SelectItem key="income" value="income">Income</SelectItem>
@@ -141,6 +147,9 @@ export default function AllTransactions() {
                         onChange={handleCategoryChange}
                         label="Category"
                         variant="faded"
+                        style={{
+                            backgroundColor: "white"
+                        }}
                     >
                         {(category: Category) => (
                             <SelectItem key={category.name}>
@@ -156,6 +165,14 @@ export default function AllTransactions() {
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         onClear={() => setSearch("")}
+                        classNames={{
+                            input: [
+                                "bg-white"
+                            ],
+                            inputWrapper: [
+                                "bg-white"
+                            ]
+                        }}
                     />
                 </div>
                 <div className="flex flex-row gap-2">

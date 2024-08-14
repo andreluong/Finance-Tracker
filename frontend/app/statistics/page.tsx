@@ -1,83 +1,77 @@
 "use client";
 
-import React, { useEffect } from "react";
 import useSWR from "swr";
 import { fetcherWithToken } from "../lib/utils";
 import Loader from "../components/dashboard/loader";
 import { useAuth } from "@clerk/nextjs";
 import dynamic from "next/dynamic";
+import TotalStatsBar from "./components/total-stats-bar";
+import { MonthlyTransactionsProp } from "../types";
+import { EXPENSE, EXPENSES, INCOME, MONTHS_SHORT } from "../constants";
+import CategoriesCard from "./components/categories-card";
 
-const CategoriesColumnChart = dynamic(() => import('./components/categories-column-chart'), { ssr: false });
+const MonthlyTransactionsLineChart = dynamic(() => import('./components/monthly-transactions-line-chart'), { ssr: false });
+const NetIncomeLineChart = dynamic(() => import('./components/net-income-line-chart'), { ssr: false });
 
 export default function Statistics() {
     const { getToken } = useAuth();
 
     const {
-        data: statistics,
-        error: statisticsError,
-        isLoading: statisticsIsLoading,
+        data: monthlyData,
+        error: monthlyDataError,
+        isLoading: monthlyDataIsLoading,
     } = useSWR(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/statistics/income-expense-stats`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/statistics/monthly-transactions`,
         async (url: string) => fetcherWithToken(url, await getToken())
     )
 
-    if (statisticsError) throw statisticsError || new Error("Failed to load statistics");
-    if (statisticsIsLoading) return <Loader />;
+    const {
+        data: categories,
+        error: categoriesError,
+        isLoading: categoriesIsLoading,
+    } = useSWR(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/statistics/categories`,
+        async (url: string) => fetcherWithToken(url, await getToken())
+    )
+
+    if (monthlyDataError || categoriesError) 
+        throw monthlyDataError || categoriesError || new Error("Failed to load statistics");
+    if (monthlyDataIsLoading || categoriesIsLoading) return <Loader />;
+
+    // Monthly income
+    const monthlyIncome = monthlyData.monthlyTransactions
+        .filter((transaction: MonthlyTransactionsProp) => transaction.type === INCOME.value)
+        .map((transaction: MonthlyTransactionsProp) => transaction.total_amount);
+
+    // Monthly Expenses
+    const monthlyExpenses = monthlyData.monthlyTransactions
+        .filter((transaction: MonthlyTransactionsProp) => transaction.type === EXPENSE.value)
+        .map((transaction: MonthlyTransactionsProp) => transaction.total_amount);
+
+    // Get unique dates from monthly transactions
+    const dates: string[] = Array.from(new Set(monthlyData.monthlyTransactions.map((transaction: MonthlyTransactionsProp) => {
+        const month = MONTHS_SHORT[transaction.month - 1];
+        return `${month} ${transaction.year}`;
+    })));
 
     return (
-        <div>
-            <h1 className="font-bold text-3xl pb-4">Statistics</h1>
-            <div className="flex flex-row justify-between gap-4">
-                <div className="border border-zinc-200 rounded-lg p-4 w-1/2 bg-white">
-                    <h2 className="font-bold text-2xl pb-4">Income</h2>
-                    <div className="flex flex-row justify-between gap-4">
-                        <div className="rounded-lg p-4 w-1/2 bg-emerald-100 space-y-2">
-                            <p>Total Amount</p>
-                            <p>${statistics.income.total}</p>
-                        </div>
-                        <div className="rounded-lg p-4 w-1/2 bg-emerald-100 space-y-2">
-                            <p>Total Transactions</p>
-                            <p>{statistics.income.count}</p>
-                        </div>
-                    </div>
-                    <div className="space-y-4">
-                        <p className="text-2xl mt-8">Categories</p>
-                        <div>
-                            <p className="text-xl p-4 pb-3">Earned</p>
-                            <CategoriesColumnChart categoryData={statistics.income.categories} dataKey="total" />
-                        </div>
-                        <div>
-                            <p className="text-xl p-4 pb-3">Frequency</p>
-                            <CategoriesColumnChart categoryData={statistics.income.categories} dataKey="count" />
-                        </div>
-                    </div>
-                </div>
-                <div className="border border-zinc-200 rounded-lg p-4 w-1/2 bg-white">
-                    <h2 className="font-bold text-2xl pb-4">Expenses</h2>
-
-                    <div className="flex flex-row justify-between gap-4">
-                        <div className="rounded-lg p-4 w-1/2 bg-emerald-100 space-y-2">
-                            <p>Total Amount</p>
-                            <p>${statistics.expense.total}</p>
-                        </div>
-                        <div className="rounded-lg p-4 w-1/2 bg-emerald-100 space-y-2">
-                            <p>Total Transactions</p>
-                            <p>{statistics.expense.count}</p>
-                        </div>
-                    </div>
-                    <div className="space-y-4">
-                        <p className="text-2xl mt-8">Categories</p>
-                        <div>
-                            <p className="text-xl p-4 pb-3">Spent</p>
-                            <CategoriesColumnChart categoryData={statistics.expense.categories} dataKey="total" />
-                        </div>
-                        <div>
-                            <p className="text-xl p-4 pb-3">Frequency</p>
-                            <CategoriesColumnChart categoryData={statistics.expense.categories} dataKey="count" />
-                        </div>
-                    </div>
-                </div>
+        <div className="space-y-4">
+            <h1 className="font-bold text-3xl">Statistics</h1>
+            <TotalStatsBar 
+                totalIncome={monthlyData.totalIncome.total} 
+                totalExpenses={monthlyData.totalExpenses.total}
+                numTransactions={monthlyData.numTransactions}
+            />
+            <div className="border border-zinc-200 rounded-lg bg-white">
+                <p className="text-2xl p-4 pb-3">Cumulative Net Income</p>
+                <NetIncomeLineChart monthlyIncome={monthlyIncome} monthlyExpenses={monthlyExpenses} dates={dates} />
             </div>
+            <div className="border border-zinc-200 rounded-lg bg-white">
+                <p className="text-2xl p-4 pb-3">Monthly Transactions</p>
+                <MonthlyTransactionsLineChart monthlyIncome={monthlyIncome} monthlyExpenses={monthlyExpenses} dates={dates} />
+            </div>
+            <CategoriesCard title={INCOME.title} categories={categories.income} />
+            <CategoriesCard title={EXPENSES.title} categories={categories.expense} />
         </div>
     );
 }

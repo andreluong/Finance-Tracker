@@ -265,6 +265,7 @@ const category = {
             SELECT 
                 c.name AS name,
                 c.colour AS colour,
+                c.icon AS icon,
                 COUNT(t.id) AS count,
                 SUM(t.amount) AS total,
                 c.type AS type
@@ -292,6 +293,7 @@ const category = {
             GROUP BY 
                 c.name,
                 c.colour,
+                c.icon,
                 c.type
             ORDER BY 
                 total DESC;
@@ -435,6 +437,58 @@ const statistics = {
         const res = await pool.query(q, [user_id, type]);
         return res.rows[0];
     },
+
+    getMonthlyTransactions: async function (user_id) {
+        const q = `
+            SELECT
+                DATE_PART('month', date) AS month,
+                DATE_PART('year', date) AS year,
+                SUM(amount) AS total_amount,
+                type
+            FROM
+                transaction
+            WHERE
+                user_id = $1
+            GROUP BY
+                DATE_PART('month', date),
+                DATE_PART('year', date),
+                type
+            ORDER BY
+                year,
+                month;
+        `;
+        const res = await pool.query(q, [user_id]);
+        return res.rows;
+    },
+
+    getTotalIncomeAndExpenses: async function (user_id) {
+        const q = `
+            SELECT
+                SUM(amount) AS total,
+                type
+            FROM
+                transaction
+            WHERE
+                user_id = $1
+            GROUP BY
+                type;
+        `;
+        const res = await pool.query(q, [user_id]);
+        return res.rows;
+    },
+
+    getNumberOfTransactions: async function (user_id) {
+        const q = `
+            SELECT
+                COUNT(id) AS count
+            FROM
+                transaction
+            WHERE
+                user_id = $1;
+        `;
+        const res = await pool.query(q, [user_id]);
+        return res.rows[0].count;
+    }
 };
 
 module.exports = { transaction, category, overview, statistics };

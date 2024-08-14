@@ -10,4 +10,16 @@ router.get(
     statisticsController.getIncomeAndExpenseStats
 );
 
+router.get(
+    "/api/statistics/monthly-transactions",
+    clerkAuth,
+    statisticsController.getPerMonthData
+);
+
+router.get(
+    "/api/statistics/categories",
+    clerkAuth,
+    statisticsController.getCategoryData
+);
+
 module.exports = router;

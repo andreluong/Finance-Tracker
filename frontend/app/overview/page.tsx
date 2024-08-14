@@ -8,6 +8,7 @@ import { Select, SelectItem } from "@nextui-org/react";
 import Loader from "../components/dashboard/loader";
 import { KeyValueProp } from "../types";
 import dynamic from "next/dynamic";
+import { MONTHS } from "../constants";
 
 type TopSpendingCategory = {
     name: string;
@@ -23,22 +24,7 @@ type FrequentSpendingCategory = {
     icon: string;
 };
 
-const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December"
-];
-
-const MonthlyTransactionsChart = dynamic(() => import('./components/monthly-transactions-chart'), { ssr: false });
+const MonthlyTransactionsBarChart = dynamic(() => import('./components/monthly-transactions-bar-chart'), { ssr: false });
 
 export default function Overview() {
     const { getToken } = useAuth();
@@ -84,7 +70,7 @@ export default function Overview() {
         <div>
             <div className="flex flex-row w-full">
                 <h1 className="text-4xl font-bold mb-4 w-4/5">
-                    Overview of {months[month - 1]} {year}
+                    Overview of {MONTHS[month - 1]} {year}
                 </h1>
                 <div className="flex flex-row w-1/5 my-auto gap-2">
                     <Select
@@ -93,8 +79,11 @@ export default function Overview() {
                         className="w-3/5"
                         variant="faded"
                         onChange={(e) => setMonth(Number(e.target.value))}
+                        style={{
+                            backgroundColor: "white"
+                        }}
                     >
-                        {months.map((month, index) => (
+                        {MONTHS.map((month, index) => (
                             <SelectItem key={index + 1} value={month}>
                                 {month}
                             </SelectItem>
@@ -108,6 +97,9 @@ export default function Overview() {
                         variant="faded"
                         onChange={(e) => setYear(e.target.value.toString())}
                         disallowEmptySelection
+                        style={{
+                            backgroundColor: "white"
+                        }}
                     >
                         {(year: KeyValueProp<string, string>) => (
                             <SelectItem key={year.value} value={year.value}>
@@ -189,7 +181,7 @@ export default function Overview() {
             </div>
             <div className="border border-zinc-200 bg-white rounded-lg my-2">
                 <p className="text-2xl p-4 pb-3">Monthly Transactions</p>
-                <MonthlyTransactionsChart data={monthlyTransactions} />
+                <MonthlyTransactionsBarChart data={monthlyTransactions} />
             </div>
         </div>
     );

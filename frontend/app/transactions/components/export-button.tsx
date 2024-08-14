@@ -34,11 +34,12 @@ export default function ExportButton({
         <Button
             isIconOnly
             variant="faded"
-            className="my-auto h-full hover:border-zinc-400 hover:bg-white"
+            className="my-auto h-full w-full px-4 hover:border-zinc-500 bg-white"
             size="lg"
             onClick={handleExport}
+            endContent={<Icon icon="lucide:download" className="h-5 w-5" />}
         >
-            <Icon icon="lucide:download" className="h-5 w-5" />
+            Export&nbsp;
         </Button>
     );
 }
