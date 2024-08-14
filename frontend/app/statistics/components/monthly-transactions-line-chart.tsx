@@ -1,5 +1,4 @@
 import { EXPENSES, INCOME } from '@/app/constants';
-import { MonthlyTransactionsProp } from '@/app/types';
 import ReactApexChart from 'react-apexcharts'
 
 export default function MonthlyTransactionsLineChart({
@@ -7,8 +6,8 @@ export default function MonthlyTransactionsLineChart({
     monthlyExpenses,
     dates
 }: {
-    monthlyIncome: MonthlyTransactionsProp[],
-    monthlyExpenses: MonthlyTransactionsProp[],
+    monthlyIncome: number[],
+    monthlyExpenses: number[],
     dates: string[]
 }) {    
     const chartState = {
@@ -35,9 +34,6 @@ export default function MonthlyTransactionsLineChart({
             },
             dataLabels: {
                 enabled: false
-            },
-            stroke: {
-                curve: "smooth"
             },
             xaxis: {
                 tickAmount: 10

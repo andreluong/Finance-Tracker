@@ -21,7 +21,7 @@ export default function NetIncomeLineChart({
         const expenseValue = monthlyExpenses[i] || 0;
         const netIncome = incomeValue - expenseValue;
         totalNetIncome += netIncome;
-        cumulativeNetIncome.push(totalNetIncome.toFixed(2));
+        cumulativeNetIncome.push(Number(totalNetIncome.toFixed(2)));
     }
 
     const chartState = {
@@ -44,9 +44,6 @@ export default function NetIncomeLineChart({
             },
             dataLabels: {
                 enabled: false
-            },
-            stroke: {
-                curve: "smooth"
             },
             xaxis: {
                 tickAmount: 10
