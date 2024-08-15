@@ -10,8 +10,7 @@ import { MonthlyTransactionsProp } from "../types";
 import { EXPENSE, EXPENSES, INCOME, MONTHS_SHORT } from "../constants";
 import CategoriesCard from "./components/categories-card";
 
-const MonthlyTransactionsLineChart = dynamic(() => import('./components/monthly-transactions-line-chart'), { ssr: false });
-const NetIncomeLineChart = dynamic(() => import('./components/net-income-line-chart'), { ssr: false });
+const LineChart = dynamic(() => import('./components/line-chart'), { ssr: false });
 
 export default function Statistics() {
     const { getToken } = useAuth();
@@ -54,6 +53,19 @@ export default function Statistics() {
         return `${month} ${transaction.year}`;
     })));
 
+    // Calculate cumulative net income
+    const cumulativeNetIncome = [];
+    let totalNetIncome = 0;
+    const maxLength = Math.max(monthlyIncome.length, monthlyExpenses.length);
+
+    for (let i = 0; i < maxLength; i++) {
+        const incomeValue = monthlyIncome[i] || 0;
+        const expenseValue = monthlyExpenses[i] || 0;
+        const netIncome = incomeValue - expenseValue;
+        totalNetIncome += netIncome;
+        cumulativeNetIncome.push(Number(totalNetIncome.toFixed(2)));
+    }
+
     return (
         <div className="space-y-4">
             <h1 className="font-bold text-3xl">Statistics</h1>
@@ -64,11 +76,22 @@ export default function Statistics() {
             />
             <div className="border border-zinc-200 rounded-lg bg-white">
                 <p className="text-2xl p-4 pb-3">Cumulative Net Income</p>
-                <NetIncomeLineChart monthlyIncome={monthlyIncome} monthlyExpenses={monthlyExpenses} dates={dates} />
+                <LineChart 
+                    series={[{ name: "Net Income", data: cumulativeNetIncome }]} 
+                    colors={["#00b0ff"]} 
+                    dates={dates} 
+                />
             </div>
             <div className="border border-zinc-200 rounded-lg bg-white">
                 <p className="text-2xl p-4 pb-3">Monthly Transactions</p>
-                <MonthlyTransactionsLineChart monthlyIncome={monthlyIncome} monthlyExpenses={monthlyExpenses} dates={dates} />
+                <LineChart
+                    series={[
+                        { name: "Monthly Income", data: monthlyIncome },
+                        { name: "Monthly Expenses", data: monthlyExpenses }
+                    ]}
+                    colors={[INCOME.colour, EXPENSE.colour]}
+                    dates={dates}
+                />
             </div>
             <CategoriesCard title={INCOME.title} categories={categories.income} />
             <CategoriesCard title={EXPENSES.title} categories={categories.expense} />

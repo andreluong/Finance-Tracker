@@ -1,38 +1,25 @@
+import React from 'react'
 import ReactApexChart from 'react-apexcharts'
 
-export default function NetIncomeLineChart({
-    monthlyIncome,
-    monthlyExpenses,
+type ChartSeriesProps = {
+    name: string,
+    data: number[]
+}
+
+export default function LineChart({
+    series,
+    colors,
     dates
 }: {
-    monthlyIncome: number[],
-    monthlyExpenses: number[],
+    series: ChartSeriesProps[],
+    colors: string[],
     dates: string[]
 }) {
 
-    // Calculate cumulative net income
-    const cumulativeNetIncome = [];
-    let totalNetIncome = 0;
-
-    const maxLength = Math.max(monthlyIncome.length, monthlyExpenses.length);
-
-    for (let i = 0; i < maxLength; i++) {
-        const incomeValue = monthlyIncome[i] || 0;
-        const expenseValue = monthlyExpenses[i] || 0;
-        const netIncome = incomeValue - expenseValue;
-        totalNetIncome += netIncome;
-        cumulativeNetIncome.push(Number(totalNetIncome.toFixed(2)));
-    }
-
     const chartState = {
-        series: [ 
-            {
-                name: "Net Income",
-                data: cumulativeNetIncome
-            },
-        ],
+        series,
         options: {
-            colors: ["#00b0ff"],
+            colors,
             labels: dates,
             chart: {
                 zoom: {
