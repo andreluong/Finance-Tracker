@@ -48,6 +48,14 @@ export const EXPENSE = {
     colour: '#ff4560',
 };
 
+export const NET_INCOME = {
+    title: 'Net Income',
+    value: 'netIncome',
+    icon: <Icon icon="mdi:chart-line" width="28" height="28" color='blue' />,
+    iconName: 'mdi:chart-line',
+    colour: '#536dfe',
+};
+
 export const MONTHS = [
     "January",
     "February",

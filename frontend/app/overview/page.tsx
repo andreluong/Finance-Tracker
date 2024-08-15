@@ -8,7 +8,8 @@ import { Select, SelectItem } from "@nextui-org/react";
 import Loader from "../components/dashboard/loader";
 import { KeyValueProp } from "../types";
 import dynamic from "next/dynamic";
-import { MONTHS } from "../constants";
+import { EXPENSES, INCOME, MONTHS, NET_INCOME } from "../constants";
+import StatCard from "../components/ui/stat-card";
 
 type TopSpendingCategory = {
     name: string;
@@ -66,6 +67,24 @@ export default function Overview() {
         return <Loader />;
     }
 
+    const statsRow = [
+        {
+            title: NET_INCOME.title,
+            amount: overview.finances.netIncome,
+            icon: NET_INCOME.iconName
+        },
+        {
+            title: INCOME.title,
+            amount: overview.finances.income,
+            icon: INCOME.iconName
+        },
+        {
+            title: EXPENSES.title,
+            amount: overview.finances.expense,
+            icon: EXPENSES.iconName
+        }
+    ]
+
     return (
         <div>
             <div className="flex flex-row w-full">
@@ -109,25 +128,12 @@ export default function Overview() {
                     </Select>
                 </div>
             </div>
-            <div className="flex flex-row gap-4">
-                <div className="border border-zinc-200 bg-white rounded-lg my-2 p-4 w-1/3">
-                    <p className="text-2xl pb-8">Net Income</p>
-                    <div className="text-4xl font-bold">
-                        {overview.finances.netIncome}
+            <div className="flex flex-row space-x-4 justify-between mb-2">
+                {statsRow.map((item) => (
+                    <div className="bg-white border border-zinc-200 rounded-lg p-4 w-full">
+                        <StatCard item={item} fontSize={["text-2xl", "text-4xl"]} />
                     </div>
-                </div>
-                <div className="border border-zinc-200 bg-white rounded-lg my-2 p-4 w-1/3">
-                    <p className="text-2xl pb-8">Income</p>
-                    <div className="text-4xl font-bold">
-                        {overview.finances.income}
-                    </div>
-                </div>
-                <div className="border border-zinc-200 bg-white rounded-lg my-2 p-4 w-1/3">
-                    <p className="text-2xl pb-8">Expenses</p>
-                    <div className="text-4xl font-bold">
-                        {overview.finances.expense}
-                    </div>
-                </div>
+                ))}
             </div>
             <div className="flex flex-row gap-4 w-full">
                 <div className="border border-zinc-200 bg-white rounded-lg my-2 p-4 w-1/2">
@@ -154,9 +160,7 @@ export default function Overview() {
                     </div>
                 </div>
                 <div className="border border-zinc-200 bg-white rounded-lg my-2 p-4 w-1/2">
-                    <p className="text-2xl pb-8">
-                        Frequent Spending Categories
-                    </p>
+                    <p className="text-2xl pb-8">Frequent Spending Categories</p>
                     <div className="flex flex-row items-center gap-4">
                         {overview.frequentSpendingCategories.map(
                             (category: FrequentSpendingCategory) => (
