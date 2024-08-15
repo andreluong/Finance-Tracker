@@ -37,7 +37,7 @@ export type CategoryStat = {
     percentage?: string;
     icon?: string;
     colour: string;
-    type: string;
+    type?: string;
 }
 
 export type KeyValueProp<T, U> = {

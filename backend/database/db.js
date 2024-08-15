@@ -355,42 +355,7 @@ const overview = {
                 c.name,
                 c.icon,
                 c.colour,
-                SUM(amount) AS total_spent
-            FROM
-                transaction t, category c
-            WHERE
-                t.category_id = c.id
-                AND t.type = 'expense'
-                AND user_id = $1
-                AND DATE_PART('year', date) = $2
-        `;
-        let params = [user_id, year];
-
-        if (month !== "0") {
-            q += ` AND DATE_PART('month', date) = $${params.length + 1}`;
-            params.push(month);
-        }
-
-        q += ` 
-            GROUP BY
-                c.name,
-                c.icon,
-                c.colour
-            ORDER BY
-                total_spent DESC
-            LIMIT 4;
-        `;
-
-        const res = await pool.query(q, params);
-        return res.rows;
-    },
-
-    getFrequentSpendingCategories: async function (user_id, month, year) {
-        let q = `
-            SELECT
-                c.name,
-                c.icon,
-                c.colour,
+                SUM(amount) AS total,
                 COUNT(t.id) AS count
             FROM
                 transaction t, category c
@@ -413,7 +378,45 @@ const overview = {
                 c.icon,
                 c.colour
             ORDER BY
-                count DESC
+                total DESC
+            LIMIT 3;
+        `;
+
+        const res = await pool.query(q, params);
+        return res.rows;
+    },
+
+    getFrequentSpendingCategories: async function (user_id, month, year) {
+        let q = `
+            SELECT
+                c.name,
+                c.icon,
+                c.colour,
+                SUM(amount) AS total,
+                COUNT(t.id) AS count
+            FROM
+                transaction t, category c
+            WHERE
+                t.category_id = c.id
+                AND t.type = 'expense'
+                AND user_id = $1
+                AND DATE_PART('year', date) = $2
+        `;
+        let params = [user_id, year];
+
+        if (month !== "0") {
+            q += ` AND DATE_PART('month', date) = $${params.length + 1}`;
+            params.push(month);
+        }
+
+        q += ` 
+            GROUP BY
+                c.name,
+                c.icon,
+                c.colour
+            ORDER BY
+                count DESC,
+                total DESC
             LIMIT 3;
         `;
 

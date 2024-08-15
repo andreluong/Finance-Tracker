@@ -8,7 +8,7 @@ import dynamic from "next/dynamic";
 import TotalStatsBar from "./components/total-stats-bar";
 import { MonthlyTransactionsProp } from "../types";
 import { EXPENSE, EXPENSES, INCOME, MONTHS_SHORT } from "../constants";
-import CategoriesCard from "./components/categories-card";
+import CategoriesCard from "../components/ui/categories-card";
 
 const LineChart = dynamic(() => import('./components/line-chart'), { ssr: false });
 
@@ -93,8 +93,16 @@ export default function Statistics() {
                     dates={dates}
                 />
             </div>
-            <CategoriesCard title={INCOME.title} categories={categories.income} />
-            <CategoriesCard title={EXPENSES.title} categories={categories.expense} />
+            <CategoriesCard 
+                title={INCOME.title} 
+                categories={categories.income} 
+                columns={4}
+            />
+            <CategoriesCard 
+                title={EXPENSES.title} 
+                categories={categories.expense} 
+                columns={4}
+            />
         </div>
     );
 }

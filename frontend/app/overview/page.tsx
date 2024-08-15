@@ -10,20 +10,7 @@ import { KeyValueProp } from "../types";
 import dynamic from "next/dynamic";
 import { EXPENSES, INCOME, MONTHS, NET_INCOME } from "../constants";
 import StatCard from "../components/ui/stat-card";
-
-type TopSpendingCategory = {
-    name: string;
-    total_spent: number;
-    colour: string;
-    icon: string;
-};
-
-type FrequentSpendingCategory = {
-    name: string;
-    count: number;
-    colour: string;
-    icon: string;
-};
+import CategoriesCard from "../components/ui/categories-card";
 
 const MonthlyTransactionsBarChart = dynamic(() => import('./components/monthly-transactions-bar-chart'), { ssr: false });
 
@@ -86,9 +73,9 @@ export default function Overview() {
     ]
 
     return (
-        <div>
+        <div className="space-y-4">
             <div className="flex flex-row w-full">
-                <h1 className="text-4xl font-bold mb-4 w-4/5">
+                <h1 className="text-4xl font-bold w-4/5">
                     Overview of {MONTHS[month - 1]} {year}
                 </h1>
                 <div className="flex flex-row w-1/5 my-auto gap-2">
@@ -128,62 +115,24 @@ export default function Overview() {
                     </Select>
                 </div>
             </div>
-            <div className="flex flex-row space-x-4 justify-between mb-2">
+            <div className="flex flex-row space-x-4 justify-between">
                 {statsRow.map((item) => (
                     <div className="bg-white border border-zinc-200 rounded-lg p-4 w-full">
                         <StatCard item={item} fontSize={["text-2xl", "text-4xl"]} />
                     </div>
                 ))}
             </div>
-            <div className="flex flex-row gap-4 w-full">
-                <div className="border border-zinc-200 bg-white rounded-lg my-2 p-4 w-1/2">
-                    <p className="text-2xl pb-8">
-                        Top Spending Categories
-                    </p>
-                    <div className="flex flex-row gap-4">
-                        {overview.topSpendingCategories.map(
-                            (category: TopSpendingCategory) => (
-                                <div
-                                    className="rounded-lg p-4 w-1/4"
-                                    key={category.name}
-                                    style={{ backgroundColor: category.colour }}
-                                >
-                                    <div className="text-lg font-bold">
-                                        {category.name}
-                                    </div>
-                                    <div className="text-2xl">
-                                        ${category.total_spent}
-                                    </div>
-                                </div>
-                            )
-                        )}
-                    </div>
-                </div>
-                <div className="border border-zinc-200 bg-white rounded-lg my-2 p-4 w-1/2">
-                    <p className="text-2xl pb-8">Frequent Spending Categories</p>
-                    <div className="flex flex-row items-center gap-4">
-                        {overview.frequentSpendingCategories.map(
-                            (category: FrequentSpendingCategory) => (
-                                <div
-                                    className="rounded-lg p-4 w-1/3"
-                                    key={category.name}
-                                    style={{
-                                        backgroundColor: category.colour,
-                                    }}
-                                >
-                                    <div className="text-lg font-bold">
-                                        {category.name}
-                                    </div>
-                                    <div className="text-2xl">
-                                        {category.count}
-                                    </div>
-                                </div>
-                            )
-                        )}
-                    </div>
-                </div>
+            <div className="flex flex-row space-x-4">
+                <CategoriesCard 
+                    title="Top Spending Categories" 
+                    categories={overview.topSpendingCategories} 
+                />
+                <CategoriesCard 
+                    title="Frequent Spending Categories" 
+                    categories={overview.frequentSpendingCategories} 
+                />
             </div>
-            <div className="border border-zinc-200 bg-white rounded-lg my-2">
+            <div className="border border-zinc-200 bg-white rounded-lg">
                 <p className="text-2xl p-4 pb-3">Monthly Transactions</p>
                 <MonthlyTransactionsBarChart data={monthlyTransactions} />
             </div>
