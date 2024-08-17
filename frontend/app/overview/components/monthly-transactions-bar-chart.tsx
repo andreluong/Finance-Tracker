@@ -1,5 +1,5 @@
-import { EXPENSES, INCOME } from '@/app/constants';
-import React, { useEffect, useState } from 'react'
+import { EXPENSES, INCOME, MONTHS_SHORT } from '@/app/constants';
+import { FinancialType } from '@/app/types';
 import ReactApexChart from "react-apexcharts";
 
 type MonthlyTransactionsChartProps = {
@@ -41,7 +41,19 @@ export default function MonthlyTransactionsBarChart({
                 enabled: false
             },
             xaxis: {
-                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                categories: MONTHS_SHORT,
+                labels: {
+                    style: {
+                        fontSize: '14px'
+                    }
+                }
+            },
+            yaxis: {
+                labels: {
+                    style: {
+                        fontSize: '14px'
+                    }
+                }
             },
             chart: {
                 toolbar: {
@@ -76,7 +88,7 @@ export default function MonthlyTransactionsBarChart({
                     options={chartState.options}
                     series={chartState.series}
                     type="bar"
-                    height={330}
+                    height={350}
                 />
             }
         </>

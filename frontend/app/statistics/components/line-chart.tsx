@@ -21,6 +21,21 @@ export default function LineChart({
         options: {
             colors,
             labels: dates,
+            xaxis: {
+                tickAmount: 10,
+                labels: {
+                    style: {
+                        fontSize: '14px'
+                    }
+                }
+            },
+            yaxis: {
+                labels: {
+                    style: {
+                        fontSize: '14px'
+                    }
+                }
+            },
             chart: {
                 zoom: {
                     enabled: false
@@ -31,9 +46,6 @@ export default function LineChart({
             },
             dataLabels: {
                 enabled: false
-            },
-            xaxis: {
-                tickAmount: 10
             },
             annotations: {
                 yaxis: [
@@ -53,7 +65,7 @@ export default function LineChart({
                     options={chartState.options}
                     series={chartState.series}
                     type="line"
-                    height={350}
+                    height={360}
                 />
             }
         </>
