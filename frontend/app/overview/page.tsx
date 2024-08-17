@@ -116,8 +116,8 @@ export default function Overview() {
                 </div>
             </div>
             <div className="flex flex-row space-x-4 justify-between">
-                {statsRow.map((item) => (
-                    <div className="bg-white border border-zinc-200 rounded-lg p-4 w-full">
+                {statsRow.map((item, index) => (
+                    <div key={index} className="bg-white border border-zinc-200 rounded-lg p-4 w-full">
                         <StatCard item={item} fontSize={["text-2xl", "text-4xl"]} />
                     </div>
                 ))}
