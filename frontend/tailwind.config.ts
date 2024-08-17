@@ -8,6 +8,11 @@ const config: Config = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}",
   ],
+  safelist: [
+    {
+      pattern: /grid-cols-./,
+    }
+  ],
   theme: {
     fontFamily:{
       sans: ['Inter', 'sans-serif'],

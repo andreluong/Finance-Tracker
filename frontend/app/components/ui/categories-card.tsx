@@ -23,17 +23,16 @@ export default function CategoriesCard({
             <div className={`grid grid-cols-${columns} gap-4`}>
                 {categories.map((category: CategoryStat, index) => (
                     <Tooltip
+                        key={index}
                         content={category.name}
                         placement="bottom"
                         size='lg'
                         shadow='sm'
                     >
                         <div
-                            key={index}
                             className="rounded-lg p-4 w-full"
                             style={{ backgroundColor: category.colour }}
                         >
-                            
                             <StatCard
                                     item={{
                                         icon: category.icon || "carbon:unknown",
