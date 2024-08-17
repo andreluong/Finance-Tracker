@@ -13,6 +13,38 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Finance Tracker",
   description: "Track your finances",
+  authors: {
+    url: "https://github.com/andreluong",
+    name: "Andre Luong"
+  },
+  keywords: ["finance", "tracker", "budget"],
+  openGraph: {
+    title: "Finance Tracker",
+    description: "Track your finances",
+    url: "https://finance-tracker-weld-gamma.vercel.app",
+    type: "website",
+    images: [
+      {
+        url: "/assets/images/android-chrome-512x512.png",
+        width: 800,
+        height: 600,
+        alt: "Finance Tracker Logo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Finance Tracker",
+    description: "Track your finances",
+    images: ["/assets/images/android-chrome-512x512.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    "max-snippet": -1,
+    "max-image-preview": "large",
+    "max-video-preview": -1,
+  }
 };
 
 if (!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
