@@ -306,22 +306,25 @@ const category = {
 
 // Overview statistics for user
 const overview = {
-    getMonthlyTransactionData: async function (user_id, year) {
+    getMonthlyTransactionData: async function (user_id, year, type) {
         const q = `
             SELECT
                 DATE_PART('month', date) AS month,
-                SUM(amount) AS total_amount,
+                SUM(amount) AS amount,
                 type
             FROM
                 transaction
             WHERE
-                DATE_PART('year', date) = $2
+                type = $3
+                AND DATE_PART('year', date) = $2
                 AND user_id = $1
             GROUP BY
                 DATE_PART('month', date),
-                type;
+                type
+            ORDER BY
+                month ASC;
         `;
-        const res = await pool.query(q, [user_id, year]);
+        const res = await pool.query(q, [user_id, year, type]);
         return res.rows;
     },
 

@@ -1,12 +1,36 @@
 const database = require("../database/db");
-const { requestToKey, readCache, writeCache, handleRequest } = require("../database/redis");
-
+const { requestToKey, readCache, writeCache } = require("../database/redis");
 
 const getMonthlyTransactionData = async (req, res) => {
     const { year } = req.query;
 
     try {
-        handleRequest(req, res, database.overview.getMonthlyTransactionData(req.auth.userId, year));
+        const key = requestToKey(req);
+        const cachedData = await readCache(key);
+
+        if (cachedData) {
+            res.status(200).json(JSON.parse(cachedData));
+        } else {
+            const userId = req.auth.userId;
+
+            const incomeData = await database.overview.getMonthlyTransactionData(userId, year, "income");
+            const expensesData = await database.overview.getMonthlyTransactionData(userId, year, "expense");
+            const incomeAvg = await incomeData.reduce((acc, curr) => acc + Number(curr.amount), 0) / incomeData.length;
+            const expensesAvg = await expensesData.reduce((acc, curr) => acc + Number(curr.amount), 0) / expensesData.length;
+
+            const data = { 
+                income: {
+                    monthlyTransactions: incomeData,
+                    avg: incomeAvg.toFixed(2)
+                },
+                expenses: {
+                    monthlyTransactions: expensesData,
+                    avg: expensesAvg.toFixed(2)
+                }
+            };
+            writeCache(key, data);
+            res.status(200).json(data);
+        }
     } catch (error) {
         console.error(error.message);
         res.status(500).json({

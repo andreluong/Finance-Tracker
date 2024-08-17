@@ -19,15 +19,7 @@ export default function Overview() {
     const [month, setMonth] = useState<number>(new Date().getMonth() + 1);
     const [year, setYear] = useState<string>(new Date().getFullYear().toString());
 
-    const {
-        data: monthlyTransactions,
-        error: monthlyTransactionsError,
-        isLoading: isMonthlyTransactionsLoading,
-    } = useSWR(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/overview/monthly-transactions?year=${year}`,
-        async (url: string) => fetcherWithToken(url, await getToken())
-    );
-
+    // Fetch all years related to transactions
     const {
         data: years,
         error: yearsError,
@@ -37,6 +29,17 @@ export default function Overview() {
         async (url: string) => fetcherWithToken(url, await getToken())
     );
 
+    // Fetch monthly transactions for the selected month and year
+    const {
+        data: monthlyTransactions,
+        error: monthlyTransactionsError,
+        isLoading: isMonthlyTransactionsLoading,
+    } = useSWR(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/overview/monthly-transactions?year=${year}`,
+        async (url: string) => fetcherWithToken(url, await getToken())
+    );
+    
+    // Fetch overview data for the selected month and year
     const {
         data: overview,
         error: overviewError,
@@ -134,7 +137,10 @@ export default function Overview() {
             </div>
             <div className="border border-zinc-200 bg-white rounded-lg">
                 <p className="text-2xl p-4 pb-3">Monthly Transactions</p>
-                <MonthlyTransactionsBarChart data={monthlyTransactions} />
+                <MonthlyTransactionsBarChart 
+                    incomeData={monthlyTransactions.income} 
+                    expenseData={monthlyTransactions.expenses} 
+                />
             </div>
         </div>
     );

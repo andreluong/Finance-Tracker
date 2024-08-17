@@ -2,27 +2,40 @@ import { EXPENSES, INCOME, MONTHS_SHORT } from '@/app/constants';
 import { FinancialType } from '@/app/types';
 import ReactApexChart from "react-apexcharts";
 
-type MonthlyTransactionsChartProps = {
+type MonthlyTransactionData = {
     month: string;
-    total_amount: string;
+    amount: string;
     type: string;
 }
 
-export default function MonthlyTransactionsBarChart({
-    data
-}: {
-    data: MonthlyTransactionsChartProps[];
-}) {
-    const [monthlyIncomeData, setMonthlyIncomeData] = useState<number[]>(Array(12).fill(0));
-    const [monthlyExpenseData, setMonthlyExpenseData] = useState<number[]>(Array(12).fill(0));
+type MonthlyTransactionsChartProps = {
+    monthlyTransactions: MonthlyTransactionData[];
+    avg: string;
+}
 
+const avgDottedLine = (avg: string, type: FinancialType) => {
+    return {
+        y: Number(avg) || 0,
+        borderColor: type.colour,
+        borderWidth: 2,
+        strokeDashArray: 8
+    }
+}
+
+export default function MonthlyTransactionsBarChart({
+    incomeData,
+    expenseData
+}: {
+    incomeData: MonthlyTransactionsChartProps;
+    expenseData: MonthlyTransactionsChartProps;
+}) {
     const chartState = {
         series: [{
             name: INCOME.title,
-            data: monthlyIncomeData
+            data: incomeData.monthlyTransactions.map((t: MonthlyTransactionData) => Number(t.amount))
         }, {
             name: EXPENSES.title,
-            data: monthlyExpenseData
+            data: expenseData.monthlyTransactions.map((t: MonthlyTransactionData) => Number(t.amount))
         }],
         options: {
             colors: [INCOME.colour, EXPENSES.colour],
@@ -59,27 +72,15 @@ export default function MonthlyTransactionsBarChart({
                 toolbar: {
                     show: false
                 }
+            },
+            annotations: {
+                yaxis: [
+                    avgDottedLine(incomeData.avg, INCOME),
+                    avgDottedLine(expenseData.avg, EXPENSES),
+                ]
             }
         }
     }
-
-    useEffect(() => {
-        if (data) {
-            const incomeData = Array(12).fill(0);
-            const expenseData = Array(12).fill(0);
-
-            data.forEach((transaction) => {
-                const month = Number(transaction.month) - 1;
-                if (transaction.type === "income") {
-                    incomeData[month] += Number(transaction.total_amount);
-                } else {
-                    expenseData[month] += Number(transaction.total_amount);
-                }
-            });
-            setMonthlyIncomeData(incomeData);
-            setMonthlyExpenseData(expenseData);
-        }
-    }, [data])
 
     return (
         <>
