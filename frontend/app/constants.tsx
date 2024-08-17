@@ -1,5 +1,5 @@
 import { Icon } from '@iconify/react';
-import { SideNavItem } from './types';
+import { FinancialType, SideNavItem } from './types';
 
 export const SIDENAV_ITEMS: SideNavItem[] = [
     {
@@ -24,7 +24,7 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
     }
 ];
 
-export const INCOME = {
+export const INCOME: FinancialType = {
     title: 'Income',
     value: 'income',
     icon: <Icon icon="bx:dollar-circle" width="28" height="28" color='green' />,
@@ -32,7 +32,7 @@ export const INCOME = {
     colour: '#00e396',
 };
 
-export const EXPENSES = {
+export const EXPENSES: FinancialType = {
     title: 'Expenses',
     value: 'expenses',
     icon: <Icon icon="bx:credit-card" width="28" height="28" color='red' />,
@@ -40,7 +40,7 @@ export const EXPENSES = {
     colour: '#ff4560',
 };
 
-export const EXPENSE = {
+export const EXPENSE: FinancialType = {
     title: 'Expense',
     value: 'expense',
     icon: <Icon icon="bx:credit-card" width="28" height="28" color='red' />,
@@ -48,7 +48,7 @@ export const EXPENSE = {
     colour: '#ff4560',
 };
 
-export const NET_INCOME = {
+export const NET_INCOME: FinancialType = {
     title: 'Net Income',
     value: 'netIncome',
     icon: <Icon icon="mdi:chart-line" width="28" height="28" color='blue' />,

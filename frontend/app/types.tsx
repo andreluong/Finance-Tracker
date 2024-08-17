@@ -40,6 +40,14 @@ export type CategoryStat = {
     type?: string;
 }
 
+export type FinancialType = {
+    title: string;
+    value: string;
+    icon: JSX.Element;
+    iconName: string;
+    colour: string;
+}
+
 export type KeyValueProp<T, U> = {
     label: T;
     value: U;
