@@ -102,9 +102,9 @@ export default function AllTransactions() {
     );
 
     return (
-        <div>
-            <h1 className="font-bold text-3xl pb-4">Transactions</h1>
-            <div className="flex justify-between w-full mb-4">
+        <div className="space-y-4">
+            <h1 className="font-bold text-3xl">Transactions</h1>
+            <div className="flex justify-between w-full">
                 <div className="flex flex-row gap-4 w-1/2">
                     <Select
                         items={years}
@@ -180,9 +180,7 @@ export default function AllTransactions() {
                     <DynamicExportButton transactions={filteredTransactions} />
                 </div>
             </div>
-            <div className="flex flex-wrap mb-4">
-                <CategoryStats type={type} period={period} />
-            </div>
+            <CategoryStats type={type} period={period} />
             <TransactionURLProvider defaultURL={transactionsURL}>
                 <TransactionsTable transactions={filteredTransactions} />
             </TransactionURLProvider>

@@ -35,19 +35,21 @@ export default function CategoryStats({
     const chartKey = `donut-chart-${incomeTotal}-${expenseTotal}`
 
     return (
-        <>
-            <div className="flex items-center justify-center w-3/5">
-                <DonutChart
-                    key={chartKey}
-                    type={type}
-                    categoryStats={categoryStats}
-                    incomeTotal={incomeTotal}
-                    expenseTotal={expenseTotal}
-                />
+        <div className="flex flex-row">
+            <div className="mx-auto">
+                <div className="w-3/5">
+                    <DonutChart
+                        key={chartKey}
+                        type={type}
+                        categoryStats={categoryStats}
+                        incomeTotal={incomeTotal}
+                        expenseTotal={expenseTotal}
+                    />
+                </div>
             </div>
             <div className="w-2/5">
                 <CategoryStatsTable categoryStats={categoryStats} />
             </div>
-        </>
+        </div>
     );
 }
