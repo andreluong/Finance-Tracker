@@ -74,16 +74,16 @@ export default function Statistics() {
                 totalExpenses={monthlyData.totalExpenses.total}
                 numTransactions={monthlyData.numTransactions}
             />
-            <div className="border border-zinc-200 rounded-lg bg-white">
-                <p className="text-2xl p-4 pb-3">Cumulative Net Income</p>
+            <div className="card p-0">
+                <p className="chart-title">Cumulative Net Income</p>
                 <LineChart 
                     series={[{ name: "Net Income", data: cumulativeNetIncome }]} 
                     colors={["#00b0ff"]} 
                     dates={dates} 
                 />
             </div>
-            <div className="border border-zinc-200 rounded-lg bg-white">
-                <p className="text-2xl p-4 pb-3">Monthly Transactions</p>
+            <div className="card p-0">
+                <p className="chart-title">Monthly Transactions</p>
                 <LineChart
                     series={[
                         { name: "Monthly Income", data: monthlyIncome },

@@ -41,7 +41,7 @@ export default function TotalStatsBar({
     ]
 
     return (
-        <div className="flex flex-row justify-between border border-zinc-200 rounded-lg p-4 bg-white">
+        <div className="flex flex-row justify-between card">
             {totalStats.map((item) => (
                 <StatCard item={item} />
             ))}

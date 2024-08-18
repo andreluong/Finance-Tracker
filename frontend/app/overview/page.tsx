@@ -120,7 +120,7 @@ export default function Overview() {
             </div>
             <div className="flex flex-row space-x-4 justify-between">
                 {statsRow.map((item, index) => (
-                    <div key={index} className="bg-white border border-zinc-200 rounded-lg p-4 w-full">
+                    <div key={index} className="card w-full">
                         <StatCard item={item} fontSize={["text-2xl", "text-4xl"]} />
                     </div>
                 ))}
@@ -135,8 +135,8 @@ export default function Overview() {
                     categories={overview.frequentSpendingCategories} 
                 />
             </div>
-            <div className="border border-zinc-200 bg-white rounded-lg">
-                <p className="text-2xl p-4 pb-3">Monthly Transactions</p>
+            <div className="card p-0">
+                <p className="chart-title">Monthly Transactions</p>
                 <MonthlyTransactionsBarChart 
                     incomeData={monthlyTransactions.income} 
                     expenseData={monthlyTransactions.expenses} 
