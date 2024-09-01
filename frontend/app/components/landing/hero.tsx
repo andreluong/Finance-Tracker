@@ -211,7 +211,7 @@ const Features = () => {
         {
             icon: 'lucide:credit-card',
             title: 'Transaction Management',
-            description: 'Easily manage and update your transactions with our user-friendly interface and convient filters'
+            description: 'Easily manage and update your transactions with our user-friendly interface and convenient filters'
         },
         {
             icon: 'lucide:bar-chart-3',
