@@ -4,13 +4,13 @@ import { useAuth } from "@clerk/nextjs";
 import React, { useState } from "react";
 import useSWR from "swr";
 import { fetcherWithToken } from "../lib/utils";
-import { Select, SelectItem } from "@nextui-org/react";
 import Loader from "../components/dashboard/loader";
 import { KeyValueProp } from "../types";
 import dynamic from "next/dynamic";
 import { EXPENSES, INCOME, MONTHS, NET_INCOME } from "../constants";
 import StatCard from "../components/ui/stat-card";
 import CategoriesCard from "../components/ui/categories-card";
+import DateSelection from "../components/ui/date-selection";
 
 const MonthlyTransactionsBarChart = dynamic(() => import('./components/monthly-transactions-bar-chart'), { ssr: false });
 
@@ -82,40 +82,13 @@ export default function Overview() {
                     Overview of {MONTHS[month - 1]} {year}
                 </h1>
                 <div className="flex flex-row w-1/5 my-auto gap-2">
-                    <Select
-                        selectedKeys={[String(month)]}
-                        placeholder="Select a month"
-                        className="w-3/5"
-                        variant="faded"
-                        onChange={(e) => setMonth(Number(e.target.value))}
-                        style={{
-                            backgroundColor: "white"
-                        }}
-                    >
-                        {MONTHS.map((month, index) => (
-                            <SelectItem key={index + 1} value={month}>
-                                {month}
-                            </SelectItem>
-                        ))}
-                    </Select>
-                    <Select
-                        items={years}
-                        selectedKeys={[year]}
-                        placeholder="Select a year"
-                        className="w-2/5"
-                        variant="faded"
-                        onChange={(e) => setYear(e.target.value.toString())}
-                        disallowEmptySelection
-                        style={{
-                            backgroundColor: "white"
-                        }}
-                    >
-                        {(year: KeyValueProp<string, string>) => (
-                            <SelectItem key={year.value} value={year.value}>
-                                {year.label}
-                            </SelectItem>
-                        )}
-                    </Select>
+                    <DateSelection 
+                        years={years} 
+                        month={month} 
+                        setMonth={setMonth} 
+                        year={year} 
+                        setYear={setYear}
+                    />
                 </div>
             </div>
             <div className="flex flex-row space-x-4 justify-between">
