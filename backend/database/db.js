@@ -306,23 +306,28 @@ const category = {
 
 // Overview statistics for user
 const overview = {
+    // Get monthly transaction data for user based on year and type
+    // If no transaction data is found, returns 0 and a null type
     getMonthlyTransactionData: async function (user_id, year, type) {
         const q = `
+            WITH months AS (
+                SELECT generate_series(1, 12) AS month
+            )
             SELECT
-                DATE_PART('month', date) AS month,
-                SUM(amount) AS amount,
+                months.month,
+                COALESCE(SUM(amount), 0) AS amount,
                 type
             FROM
-                transaction
-            WHERE
-                type = $3
-                AND DATE_PART('year', date) = $2
+                months
+            LEFT JOIN transaction ON months.month = DATE_PART('month', date)
                 AND user_id = $1
+                AND DATE_PART('year', date) = $2
+                AND type = $3
             GROUP BY
-                DATE_PART('month', date),
+                months.month,
                 type
             ORDER BY
-                month ASC;
+                months.month ASC;
         `;
         const res = await pool.query(q, [user_id, year, type]);
         return res.rows;
