@@ -70,8 +70,8 @@ export default function Statistics() {
         <div className="space-y-4">
             <h1 className="font-bold text-3xl">Statistics</h1>
             <TotalStatsBar 
-                totalIncome={monthlyData.totalIncome.total} 
-                totalExpenses={monthlyData.totalExpenses.total}
+                totalIncome={monthlyData.totalIncome?.total || 0} 
+                totalExpenses={monthlyData.totalExpenses?.total || 0}
                 numTransactions={monthlyData.numTransactions}
             />
             <div className="card p-0">

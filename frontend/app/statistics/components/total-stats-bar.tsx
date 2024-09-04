@@ -20,7 +20,7 @@ export default function TotalStatsBar({
         },
         {
             title: "Total Profit Ratio",
-            amount: (netIncome / totalIncome * 100).toFixed(2) + "%",
+            amount: (netIncome / totalIncome * 100 || 0).toFixed(2) + "%",
             icon: "lucide:divide"
         },
         {
