@@ -124,6 +124,46 @@ const updateTransaction = async (req, res) => {
     }
 };
 
+// Get total transaction amounts per category based on type and period
+const getTotalAmountForAllCategories = async (req, res) => {
+    const { month, year } = req.query;
+    const userId = req.auth.userId;
+
+    try {
+        const key = requestToKey(req);
+        const cachedData = await readCache(key);
+        
+        if (cachedData) {
+            res.status(200).json(JSON.parse(cachedData));
+        } else {
+            const incomeCategoryTotals = await database.category.getTotalAmountForAllCategories(
+                userId,
+                "income",
+                month,
+                year
+            );
+            const expenseCategoryTotals = await database.category.getTotalAmountForAllCategories(
+                userId,
+                "expense",
+                month,
+                year
+            );
+
+            const data = { 
+                income: incomeCategoryTotals,
+                expense: expenseCategoryTotals 
+            };
+            writeCache(key, data);
+            res.status(200).json(data);
+        }
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({
+            error: "Something went wrong with getting total transaction amounts for all categories",
+        });
+    }
+};
+
 const getCategoryStats = async (req, res) => {
     const type = req.query.type;
     const period = req.query.period;
@@ -253,6 +293,7 @@ module.exports = {
     getRecentTransactions,
     getAllTransactions,
     updateTransaction,
+    getTotalAmountForAllCategories,
     getCategoryStats,
     getYears,
     deleteTransaction,

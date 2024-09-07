@@ -53,6 +53,12 @@ router.patch(
 );
 
 router.get(
+    "/api/transactions/category/totals",
+    clerkAuth,
+    transactionsController.getTotalAmountForAllCategories
+);
+
+router.get(
     "/api/transactions/category/stats",
     clerkAuth,
     transactionsController.getCategoryStats

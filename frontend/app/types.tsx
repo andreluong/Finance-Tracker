@@ -59,3 +59,19 @@ export type MonthlyTransactionsProp = {
     total_amount: number;
     type: string;
 }
+
+/* Budget */
+
+export type CategoryTotalProps = {
+    id: string;
+    name: string;
+    total: string;
+    type: string;
+};
+
+export type BudgetTargetProps = {
+    category_id: string | number;
+    category_name: string;
+    category_type: string;
+    target: string | number;
+};

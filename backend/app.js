@@ -34,4 +34,7 @@ app.use(overview);
 const statistics = require("./routes/statistics.js");
 app.use(statistics);
 
+const budget = require("./routes/budget.js");
+app.use(budget);
+
 module.exports = app;

@@ -21,6 +21,11 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
         title: 'Statistics',
         path: '/statistics',
         icon: <Icon icon="lucide:bar-chart-3" width="24" height="24" />
+    },
+    {
+        title: 'Budget',
+        path: '/budget',
+        icon: <Icon icon="tabler:calculator" width="24" height="24" />
     }
 ];
 
