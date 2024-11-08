@@ -10,12 +10,12 @@ Link: [finance-tracker-weld-gamma.vercel.app](https://finance-tracker-weld-gamma
 
 ## Features
 
-- **Data Visualization**: Interactive charts make it easy to understand your spending trends and identify areas for improvement
-- **Transaction Management**: Add, edit, and delete transactions with a user-friendly interface that streamlines data entry
-- **Flexible Filtering**: Refine your data view by filtering transactions based on specific criteria like date, type, category, or name
-- **Smart Receipt Processing**: Upload a receipt and key information will be extracted to create a new transaction using Google Gemini
-- **Data Import/Export**: Seamlessly import and export your transactions in CSV format
-- **Security**: Data access is secured and authenticated using Clerk middleware
+- **Overview**: Summary of all transactions over any month and year
+- **Smart Receipt Processing**: Upload your receipt to effortlessly create a new transaction with Gemini AI
+- **Transaction Management**: Manage and update your transactions with a user-friendly interface
+- **Visualize Trends**: Use interactive charts to gain insight of your finances in real-time
+- **Budgeting**: Plan your finances to meet your goals
+- **CSV Import/Export**: Import and export your transactions in CSV format
 
 
 ## Technologies
@@ -56,24 +56,24 @@ Link: [finance-tracker-weld-gamma.vercel.app](https://finance-tracker-weld-gamma
 
     **Backend**
 
-    | Variable Name | Required | Description |
+    | Variable Name | Required | Info |
     | ------------- | :------: | ----------- |
-    | DATABASE_HOST | &#9745; | The hostname or IP address of your database server |
-    | DATABASE_NAME | &#9745; | The name of your database |
-    | DATABASE_PORT | &#9745; | The port number of your database server |
-    | DATABASE_USER | &#9745; | The username for your database |
-    | DATABASE_PASSWORD | &#9745; | The password for your database |
+    | DATABASE_HOST | &#9745; |  |
+    | DATABASE_NAME | &#9745; |  |
+    | DATABASE_PORT | &#9745; |  |
+    | DATABASE_USER | &#9745; |  |
+    | DATABASE_PASSWORD | &#9745; |  |
     | CLERK_SECRET_KEY | &#9745; | Your Clerk secret key (obtain from your Clerk dashboard) |
     | GEMINI_API_KEY | &#9745; | Your Google Gemini API key (required for receipt processing) |
     | CLERK_PUBLISHABLE_KEY | &#9745; | Your Clerk publishable key (obtain from your Clerk dashboard) |
-    | REDIS_PASSWORD | &#9745; | The password of your Redis instance |
-    | REDIS_HOST | &#9745; | The host of your Redis instance |
-    | REDIS_PORT | &#9745; | The port number of your Redis instance |
+    | REDIS_PASSWORD | &#9745; |  |
+    | REDIS_HOST | &#9745; |  |
+    | REDIS_PORT | &#9745; |  |
     | CLIENT_URL | &#9745; | The base URL of your frontend application (e.g., `http://localhost:3000`) |
     | SERVER_PORT | &#9745; | The port number on which your backend server will listen (e.g., `8080`) |
-    | GOOGLE_PROJECT_ID | | Your Google Cloud project ID |
+    | GOOGLE_PROJECT_ID | |  |
     | GOOGLE_APPLICATION_CREDENTIALS | | Path to your Google Cloud service account JSON key file (ignore for production) |
-    | GCS_BUCKET_NAME | | The name of your Google Cloud Storage bucket |
+    | GCS_BUCKET_NAME | |  |
 
     **Frontend**
     | Variable Name | Required | Description |
@@ -84,7 +84,7 @@ Link: [finance-tracker-weld-gamma.vercel.app](https://finance-tracker-weld-gamma
 
 4. Multer and Google Cloud Storage
 
-    This step allows you to configure receipt and CSV storage using Google Cloud Storage (GCS). If you do not plan on using GCS, you can adjust the Multer configuration for local storage
+    This step allows you to configure receipt and CSV storage using Google Cloud Storage (GCS). If you do not plan on using GCS, you can adjust the Multer configuration for local storage.
     
     **Using Local Storage**
     1. In `backend/routes/transactions`, change Multer's storage option to `diskStorage`
@@ -120,11 +120,3 @@ Link: [finance-tracker-weld-gamma.vercel.app](https://finance-tracker-weld-gamma
         ```
         node server.js
         ```
-
-## Data Privacy
-
-This project uses Clerk for user authentication. Clerks stores your email address and name on their servers. We only access this information to identify you within the application and ensure secure access.
-
-**We do not store any of your uploaded receipts or CSV files**. After processing them to create a transaction, they are immediately and permanently deleted from our Google Cloud Storage.
-
-For more details on Clerk's data practices, please refer to their privacy policy: [Clerk Privacy Policy](https://clerk.com/legal/privacy)
