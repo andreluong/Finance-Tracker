@@ -10,8 +10,8 @@ const getAllCategories = async (req, res) => {
         } else {
             const income = await database.category.getAllDynamically("income");
             const expense = await database.category.getAllDynamically("expense");
-            const categories = { income, expense };
-            writeCache(key, categories);
+            const data = { income, expense };
+            writeCache(key, data);
 
             res.status(200).json(data);
         }
