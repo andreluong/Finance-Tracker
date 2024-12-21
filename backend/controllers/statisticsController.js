@@ -1,4 +1,5 @@
-const database = require("../database/db");
+const statisticsQueries = require("../database/statisticsQueries");
+const categoryQueries = require("../database/categoryQueries");
 const { requestToKey, readCache, writeCache } = require("../database/redis");
 
 const getIncomeAndExpenseStats = async (req, res) => {
@@ -9,23 +10,23 @@ const getIncomeAndExpenseStats = async (req, res) => {
         if (cachedData) {
             res.status(200).json(JSON.parse(cachedData));
         } else {
-            const incomeStats = await database.statistics.getCountAndSumOfAmounts(
+            const incomeStats = await statisticsQueries.getCountAndSumOfAmounts(
                 req.auth.userId,
                 "income"
             );
-            const expenseStats = await database.statistics.getCountAndSumOfAmounts(
+            const expenseStats = await statisticsQueries.getCountAndSumOfAmounts(
                 req.auth.userId,
                 "expense"
             );
     
             const incomeCategoryStats =
-                await database.category.getTotalAmountPerCategoryDynamically(
+                await categoryQueries.getTotalAmountPerCategory(
                     req.auth.userId,
                     "income",
                     null
                 );
             const expenseCategoryStats =
-                await database.category.getTotalAmountPerCategoryDynamically(
+                await categoryQueries.getTotalAmountPerCategory(
                     req.auth.userId,
                     "expense",
                     null
@@ -64,19 +65,19 @@ const getPerMonthData = async (req, res) => {
         } else {
             const userId = req.auth.userId;
 
-            const monthlyTransactions = await database.statistics.getMonthlyTransactions(
+            const monthlyTransactions = await statisticsQueries.getMonthlyTransactions(
                 userId
             );
 
             // Total income and expenses
-            const totalIncomeAndExpenses = await database.statistics.getTotalIncomeAndExpenses(
+            const totalIncomeAndExpenses = await statisticsQueries.getTotalIncomeAndExpenses(
                 userId
             );
             const totalIncome = totalIncomeAndExpenses[0];
             const totalExpenses = totalIncomeAndExpenses[1];
 
             // Number of transactions
-            const numTransactions = await database.statistics.getNumberOfTransactions(
+            const numTransactions = await statisticsQueries.getNumberOfTransactions(
                 userId
             );
 
@@ -108,13 +109,13 @@ const getCategoryData = async (req, res) => {
             const userId = req.auth.userId;
 
             const incomeCategoryStats =
-                await database.category.getTotalAmountPerCategoryDynamically(
+                await categoryQueries.getTotalAmountPerCategory(
                     userId,
                     "income",
                     null
                 );
             const expenseCategoryStats =
-                await database.category.getTotalAmountPerCategoryDynamically(
+                await categoryQueries.getTotalAmountPerCategory(
                     userId,
                     "expense",
                     null

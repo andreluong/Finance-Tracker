@@ -1,4 +1,4 @@
-const database = require("../database/db");
+const overviewQueries = require("../database/overviewQueries");
 const { requestToKey, readCache, writeCache } = require("../database/redis");
 
 const getMonthlyTransactionData = async (req, res) => {
@@ -13,8 +13,8 @@ const getMonthlyTransactionData = async (req, res) => {
         } else {
             const userId = req.auth.userId;
 
-            const incomeData = await database.overview.getMonthlyTransactionData(userId, year, "income");
-            const expensesData = await database.overview.getMonthlyTransactionData(userId, year, "expense");
+            const incomeData = await overviewQueries.getMonthlyTransactionData(userId, year, "income");
+            const expensesData = await overviewQueries.getMonthlyTransactionData(userId, year, "expense");
             const incomeAvg = await incomeData.reduce((acc, curr) => acc + Number(curr.amount), 0) / incomeData.length;
             const expensesAvg = await expensesData.reduce((acc, curr) => acc + Number(curr.amount), 0) / expensesData.length;
 
@@ -52,7 +52,7 @@ const getSummary = async (req, res) => {
             res.status(200).json(JSON.parse(cachedData));
         } else {
             // Get income and expense totals for the month and year
-            const totals = await database.overview.getIncomeAndExpenseTotals(
+            const totals = await overviewQueries.getIncomeAndExpenseTotals(
                 req.auth.userId,
                 month,
                 year
@@ -68,7 +68,7 @@ const getSummary = async (req, res) => {
 
             // Get top spending categories
             const topSpendingCategories =
-                await database.overview.getTopSpendingCategories(
+                await overviewQueries.getTopSpendingCategories(
                     req.auth.userId,
                     month,
                     year
@@ -76,7 +76,7 @@ const getSummary = async (req, res) => {
 
             // Get frequent spending categories
             const frequentSpendingCategories =
-                await database.overview.getFrequentSpendingCategories(
+                await overviewQueries.getFrequentSpendingCategories(
                     req.auth.userId,
                     month,
                     year

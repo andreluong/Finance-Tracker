@@ -1,4 +1,5 @@
-const database = require("../database/db");
+const categoryQueries = require("../database/categoryQueries");
+const transactionQueries = require("../database/transactionQueries");
 const transactionsService = require("../services/transactionsService");
 const fastCsv = require("@fast-csv/parse");
 const { isEmpty } = require("../services/utils");
@@ -51,7 +52,7 @@ const processCsv = async (req, res) => {
                 throw new Error("Invalid data from CSV file");
             }
 
-            const categoryId = await database.category.getIdByNameOrValue(Category);
+            const categoryId = await categoryQueries.getIdByNameOrValue(Category);
             await transactionsService.createTransaction(
                 Name,
                 Amount,
@@ -78,7 +79,7 @@ const processCsv = async (req, res) => {
 
 const getRecentTransactions = async (req, res) => {
     try {
-        handleRequest(req, res, database.transaction.getRecent(req.auth.userId));
+        handleRequest(req, res, transactionQueries.getRecent(req.auth.userId));
     } catch (error) {
         console.error(error.message);
         res.status(500).json({
@@ -89,7 +90,7 @@ const getRecentTransactions = async (req, res) => {
 
 const getAllTransactions = async (req, res) => {
     try {
-        handleRequest(req, res, database.transaction.getAllDynamically(req.auth.userId, req.query.period));
+        handleRequest(req, res, transactionQueries.getAll(req.auth.userId, req.query.period));
     } catch (error) {
         console.error(error.message);
         res.status(500).json({
@@ -104,7 +105,7 @@ const updateTransaction = async (req, res) => {
     const id = req.params.id;
 
     try {
-        await database.transaction.update(id, {
+        await transactionQueries.update(id, {
             name,
             amount,
             description,
@@ -136,13 +137,13 @@ const getTotalAmountForAllCategories = async (req, res) => {
         if (cachedData) {
             res.status(200).json(JSON.parse(cachedData));
         } else {
-            const incomeCategoryTotals = await database.category.getTotalAmountForAllCategories(
+            const incomeCategoryTotals = await categoryQueries.getTotalAmountForAllCategories(
                 userId,
                 "income",
                 month,
                 year
             );
-            const expenseCategoryTotals = await database.category.getTotalAmountForAllCategories(
+            const expenseCategoryTotals = await categoryQueries.getTotalAmountForAllCategories(
                 userId,
                 "expense",
                 month,
@@ -181,23 +182,22 @@ const getCategoryStats = async (req, res) => {
         } else {
             // Get total income and expense amounts for the user
             if (type === "all" || type === "income") {
-                incomeTotal = await database.transaction.getSumOfAmountsDynamically(
+                incomeTotal = await transactionQueries.getSumOfAmounts(
                     userId,
                     "income",
                     period
                 );
             }
             if (type === "all" || type === "expense") {
-                expenseTotal =
-                    await database.transaction.getSumOfAmountsDynamically(
-                        userId,
-                        "expense",
-                        period
-                    );
+                expenseTotal = await transactionQueries.getSumOfAmounts(
+                    userId,
+                    "expense",
+                    period
+                );
             }
 
             const categoryStats =
-                await database.category.getTotalAmountPerCategoryDynamically(
+                await categoryQueries.getTotalAmountPerCategory(
                     userId,
                     type,
                     period
@@ -234,7 +234,7 @@ const getYears = async (req, res) => {
         if (cachedData) {
             res.status(200).json(JSON.parse(cachedData));
         } else {
-            const yearsData = await database.transaction.getYears(req.auth.userId);
+            const yearsData = await transactionQueries.getYears(req.auth.userId);
             const years = yearsData.map((y) => ({
                 label: y.year.toString(),
                 value: y.year.toString(),
@@ -253,7 +253,7 @@ const getYears = async (req, res) => {
 const deleteTransaction = async (req, res) => {
     try {
         const id = req.params.id;
-        await database.transaction.deleteById(id, req.auth.userId);
+        await transactionQueries.deleteById(id, req.auth.userId);
         deleteCache(req.auth.userId, "transactions", "overview", "statistics");
 
         res.status(200).json({ message: "Transaction deleted" });

@@ -1,11 +1,11 @@
-const database = require("../database/db");
+const budgetQueries = require("../database/budgetQueries");
 const { requestToKey, readCache, writeCache, deleteCache, handleRequest } = require("../database/redis");
 
 const getBudgetTotals = async (req, res) => {
     const { month, year } = req.query;
 
     try {
-        handleRequest(req, res, database.budget.getBudgetTotals(req.auth.userId, month, year));
+        handleRequest(req, res, budgetQueries.getBudgetTotals(req.auth.userId, month, year));
     } catch (error) {
         console.error(error.message);
         res.status(500).json({
@@ -25,8 +25,8 @@ const getBudgetTargets = async (req, res) => {
         if (cachedData) {
             return res.status(200).json(JSON.parse(cachedData));
         } else {
-            const budgetTargets = await database.budget.getBudgetTargets(userId, month, year);
-            const targetTotals = await database.budget.getBudgetTargetsTotalAmount(userId, month, year);
+            const budgetTargets = await budgetQueries.getBudgetTargets(userId, month, year);
+            const targetTotals = await budgetQueries.getBudgetTargetsTotalAmount(userId, month, year);
             const data = {
                 categories: budgetTargets,
                 income: targetTotals.find((item) => item.type === "income"),
@@ -54,10 +54,10 @@ const modifyBudgetData = async (req, res) => {
         Object.keys(data).map((key) => parseInt(data[key]));
 
         // Get or create budget table for the given month and year
-        const budgetId = await database.budget.getBudgetTable(userId, month, year)
-            || await database.budget.createBudgetTable(userId, month, year);
+        const budgetId = await budgetQueries.getBudgetTable(userId, month, year)
+            || await budgetQueries.createBudgetTable(userId, month, year);
         
-        await database.budget.updateBudgetItems(userId, budgetId, data);
+        await budgetQueries.updateBudgetItems(userId, budgetId, data);
 
         deleteCache(userId, "budget");
 

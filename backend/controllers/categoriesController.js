@@ -1,4 +1,4 @@
-const database = require("../database/db");
+const categoryQueries = require("../database/categoryQueries");
 const { requestToKey, readCache, writeCache, handleRequest } = require("../database/redis");
 
 const getAllCategories = async (req, res) => {
@@ -8,8 +8,8 @@ const getAllCategories = async (req, res) => {
         if (cachedData) {
             res.status(200).json(JSON.parse(cachedData));
         } else {
-            const income = await database.category.getAllDynamically("income");
-            const expense = await database.category.getAllDynamically("expense");
+            const income = await categoryQueries.getAll("income");
+            const expense = await categoryQueries.getAll("expense");
             const data = { income, expense };
             writeCache(key, data);
 
@@ -27,7 +27,7 @@ const getAllUniqueCategories = async (req, res) => {
     const type = req.query.type;
 
     try {
-        handleRequest(req, res, database.category.getAllUniqueDynamically(type));
+        handleRequest(req, res, categoryQueries.getAllUnique(type));
     } catch (error) {
         console.error(error.message);
         res.status(500).json({

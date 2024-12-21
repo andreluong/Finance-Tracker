@@ -1,4 +1,4 @@
-const database = require("../database/db");
+const transactionQueries = require("../database/transactionQueries");
 
 // Gemini API
 const GoogleGenerativeAI = require('@google/generative-ai').GoogleGenerativeAI;
@@ -50,7 +50,7 @@ async function createTransaction(
     user_id
 ) {
     try {
-        await database.transaction.create({
+        await transactionQueries.create({
             name,
             amount,
             description,
@@ -67,7 +67,7 @@ async function createTransaction(
 
 // Extracts information from a receipt image using the Gemini API
 async function extractReceipt(imageBase64) {
-    const categoryList = await database.category.getAllDynamically("expense");
+    const categoryList = await categoryQueries.getAll("expense");
 
     const promptConfig = [
         {
@@ -108,7 +108,7 @@ async function processReceipt(imageBase64, user_id) {
     
     try {
         const receiptData = await extractReceipt(imageBase64);
-        const category = await database.category.getIdByNameOrValue(receiptData.category);
+        const category = await categoryQueries.getIdByNameOrValue(receiptData.category);
 
         await createTransactionFromReceipt(
             receiptData.vendor,
@@ -179,7 +179,7 @@ async function createTransactionFromReceipt(
     };
 
     try {
-        await database.transaction.create(newTransaction);
+        await transactionQueries.create(newTransaction);
         console.log("Transaction created from receipt");
     } catch (error) {
         console.error(error.message);
