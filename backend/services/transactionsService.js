@@ -8,10 +8,13 @@ const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
 // Google Cloud Storage
 const { Storage } = require('@google-cloud/storage');
 const storage = new Storage({
+    // NOTE: In local development, set the env variable and uncomment the line below
+    // keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
     projectId: process.env.GOOGLE_PROJECT_ID
 });
 const bucket = storage.bucket(process.env.GCS_BUCKET_NAME);
 
+// Uploads an image file to the bucket and returns the new file name
 async function uploadToBucket(file) {
     const newFilename = Date.now().toString() + file.originalname;
 
@@ -29,7 +32,7 @@ async function uploadToBucket(file) {
     }
 }
 
-// Delete from bucket
+// Delete a file from the bucket using the file name
 async function deleteFromBucket(filename) {
     try {
         await bucket.file(filename).delete();
