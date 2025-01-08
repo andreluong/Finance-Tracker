@@ -222,6 +222,11 @@ const Features = () => {
             icon: 'tabler:file-type-csv',
             title: 'Import/Export with CSV',
             description: 'Easily import or export your transactions with CSV files'
+        },
+        {
+            icon: 'tabler:calculator',
+            title: 'Budgeting',
+            description: 'Set monthly budget targets and track your spending'
         }
     ];
 
